@@ -1,0 +1,10 @@
+-- 25 March 2026 --
+
+INT in DB + String? in Dart = CRASH
+fix: data['phone']?.to String()
+
+.to String() on null variable = CRASH
+fix: use ?. instead of .
+
+read error messages carefully, they tell u exactly what's wrong.
+    
