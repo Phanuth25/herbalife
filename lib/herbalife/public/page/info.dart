@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:project2/herbalife/public/constants/Constants.dart';
+import 'package:project2/herbalife/public/page/product.dart';
 import 'package:project2/herbalife/public/provider/auth_provider.dart';
 import 'package:provider/provider.dart';
 
@@ -25,9 +26,10 @@ class _InfoState extends State<Info> {
   Widget build(BuildContext context) {
     // context.watch ensures the widget rebuilds when data changes in the provider
     final authProvider = context.watch<Authprovider>();
-    
+
     return Scaffold(
-      appBar: AppBar(automaticallyImplyLeading: false,
+      appBar: AppBar(
+        automaticallyImplyLeading: false,
         title: Center(
           child: const Text(
             "Herbalife",
@@ -48,19 +50,27 @@ class _InfoState extends State<Info> {
                       // 1. DYNAMIC NAME
                       Text(
                         'Hello, ${authProvider.isname}!',
-                        style: kTitleStyle.copyWith(fontSize: 25).copyWith(fontFamily: 'KhmerFont'),
+                        style: kTitleStyle
+                            .copyWith(fontSize: 25)
+                            .copyWith(fontFamily: 'KhmerFont'),
                       ),
                       // Display error message if any
-                      if (authProvider.message != null && 
-                          authProvider.message!.isNotEmpty && 
+                      if (authProvider.message != null &&
+                          authProvider.message!.isNotEmpty &&
                           authProvider.message != "Profile loaded")
                         Padding(
                           padding: const EdgeInsets.all(8.0),
-                          child: Text(authProvider.message!, style: const TextStyle(color: Colors.red)),
+                          child: Text(
+                            authProvider.message!,
+                            style: const TextStyle(color: Colors.red),
+                          ),
                         ),
                       const SizedBox(height: 5),
-                      
-                      Text('Address', style: kTitleStyle.copyWith(fontSize: 25)),
+
+                      Text(
+                        'Address',
+                        style: kTitleStyle.copyWith(fontSize: 25),
+                      ),
                       Container(
                         width: 300,
                         height: 60,
@@ -69,9 +79,12 @@ class _InfoState extends State<Info> {
                           color: Colors.grey[300],
                           borderRadius: BorderRadius.circular(10),
                         ),
-                        child: Text(authProvider.isaddress, style: const TextStyle(fontSize: 18)),
+                        child: Text(
+                          authProvider.isaddress,
+                          style: const TextStyle(fontSize: 18),
+                        ),
                       ),
-                      
+
                       const SizedBox(height: 10),
                       Text('Phone', style: kTitleStyle.copyWith(fontSize: 25)),
                       Container(
@@ -83,9 +96,12 @@ class _InfoState extends State<Info> {
                           borderRadius: BorderRadius.circular(10),
                         ),
                         // 2. ADDED PHONE DATA
-                        child: Text("0${authProvider.isphone}", style: const TextStyle(fontSize: 18)),
+                        child: Text(
+                          "0${authProvider.isphone}",
+                          style: const TextStyle(fontSize: 18),
+                        ),
                       ),
-                      
+
                       const SizedBox(height: 10),
                       Text('Email', style: kTitleStyle.copyWith(fontSize: 25)),
                       Container(
@@ -97,9 +113,12 @@ class _InfoState extends State<Info> {
                           borderRadius: BorderRadius.circular(10),
                         ),
                         // 3. ADDED EMAIL DATA
-                        child: Text(authProvider.isemail, style: const TextStyle(fontSize: 18)),
+                        child: Text(
+                          authProvider.isemail,
+                          style: const TextStyle(fontSize: 18),
+                        ),
                       ),
-                      
+
                       const SizedBox(height: 20),
                       ElevatedButton(
                         style: ElevatedButton.styleFrom(
@@ -107,10 +126,20 @@ class _InfoState extends State<Info> {
                           backgroundColor: kPrimaryGreen,
                           shape: const RoundedRectangleBorder(),
                         ),
-                        onPressed: () {},
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => Product(),
+                            ),
+                          );
+                        },
                         child: Text(
                           'Continue',
-                          style: kTitleStyle.copyWith(fontSize: 20, color: Colors.white),
+                          style: kTitleStyle.copyWith(
+                            fontSize: 20,
+                            color: Colors.white,
+                          ),
                         ),
                       ),
                     ],
