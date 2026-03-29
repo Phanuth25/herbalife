@@ -14,9 +14,13 @@ class Product extends StatefulWidget {
 class _ProductState extends State<Product> {
   bool isSelected = false;
   int counter = 1;
+  String searchQuery = "";
 
   @override
   Widget build(BuildContext context) {
+    final filteredProducts = products
+        .where((product) => product.name.contains(searchQuery))
+        .toList();
     return Scaffold(
       appBar: AppBar(
         leadingWidth: 200,
@@ -64,26 +68,91 @@ class _ProductState extends State<Product> {
       ),
       body: SingleChildScrollView(
         child: Center(
-          child: GridView.builder(
-            shrinkWrap: true,
-            physics: NeverScrollableScrollPhysics(),
-            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 2,
-              childAspectRatio: 0.6,
-            ),
-            itemCount: products.length,
-            itemBuilder: (context, index) {
-              final product = products[index];
-              return Padding(
-                padding: const EdgeInsets.all(15.0),
-                child: ImageCounterCard(
-                  imagepath: product.image,
-                  product: product.name,
-                  price: product.price.toString(),
-                  point: product.point.toString(),
+          child: Column(
+            children: [
+              Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: TextField(
+                  onChanged: (value) {
+                    setState(() {
+                      searchQuery = value; // your answer!
+                    });
+                  },
+                  decoration: InputDecoration(
+                    hintText: "Search products...",
+                    prefixIcon: Icon(Icons.search),
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(20),
+                      borderSide: BorderSide(color: kPrimaryGreen, width: 3.0),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(20),
+                      borderSide: BorderSide(color: kPrimaryGreen, width: 3.5),
+                    ),
+                  ),
                 ),
-              );
-            },
+              ),
+              Padding(
+                padding: const EdgeInsets.fromLTRB(16.0, 2.0, 16.0, 8.0),
+                child: Container(
+                  width: double.infinity,
+                  height: 55,
+                  decoration: BoxDecoration(
+                    color: Colors.green,
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    spacing: 10,
+                    children: [
+                      Icon(
+                        Icons.card_travel_rounded,
+                        color: Colors.white,
+                        size: 35,
+                      ),
+                      CircleAvatar(
+                        child: Text(
+                          "1",
+                          style: kTitleStyle.copyWith(
+                            color: Colors.white,
+                            fontSize: 25,
+                          ),
+                        ),
+                      ),
+                      Text(
+                        "Point :",
+                        style: kTitleStyle.copyWith(
+                          color: Colors.white,
+                          fontSize: 25,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              GridView.builder(
+                shrinkWrap: true,
+                physics: NeverScrollableScrollPhysics(),
+                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: 2,
+                  childAspectRatio: 0.6,
+                ),
+                itemCount: filteredProducts.length,
+                itemBuilder: (context, index) {
+                  final product = filteredProducts[index];
+                  return Padding(
+                    padding: const EdgeInsets.all(15.0),
+                    child: ImageCounterCard(
+                      imagepath: product.image,
+                      product: product.name,
+                      price: product.price.toString(),
+                      point: product.point.toString(),
+                    ),
+                  );
+                },
+              ),
+            ],
           ),
         ),
       ),

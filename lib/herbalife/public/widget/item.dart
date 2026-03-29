@@ -51,13 +51,13 @@ class _ImageCounterCardState extends State<ImageCounterCard> {
           mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            Image.asset(widget.imagepath),
+            Image.asset(widget.imagepath,height: 140,),
             Text(
               widget.product,
               textAlign: TextAlign.center,
               style: TextStyle(
                 fontFamily: "KhmerFont",
-                color: kPrimaryGreen,
+                color: kPrimaryGreen,wordSpacing: 5
               ),
             ),
             Text(
