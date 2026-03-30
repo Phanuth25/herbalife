@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:project2/herbalife/public/constants/Constants.dart';
+import 'package:project2/herbalife/public/data/notifier.dart';
 import 'package:project2/herbalife/public/model/product_model.dart';
 import 'package:project2/herbalife/public/widget/welcome.dart';
 import 'package:project2/herbalife/public/widget/item.dart';
@@ -11,10 +12,22 @@ class Product extends StatefulWidget {
   State<Product> createState() => _ProductState();
 }
 
-class _ProductState extends State<Product> {
+class _ProductState extends State<Product> with TickerProviderStateMixin {
   bool isSelected = false;
-  int counter = 1;
   String searchQuery = "";
+
+  final GlobalKey cartKey = GlobalKey();
+  // In your _ProductState
+  List<GlobalKey> itemKeys = List.generate(
+    products.length,
+        (index) => GlobalKey(),
+  );
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -57,7 +70,7 @@ class _ProductState extends State<Product> {
                 children: [
                   Icon(Icons.exit_to_app, color: Colors.white, size: 25),
                   Text(
-                    "Help",
+                    "Exit",
                     style: kTitleStyle.copyWith(color: Colors.white),
                   ),
                 ],
@@ -66,96 +79,247 @@ class _ProductState extends State<Product> {
           ),
         ],
       ),
-      body: SingleChildScrollView(
-        child: Center(
-          child: Column(
-            children: [
-              Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: TextField(
-                  onChanged: (value) {
-                    setState(() {
-                      searchQuery = value; // your answer!
-                    });
-                  },
-                  decoration: InputDecoration(
-                    hintText: "Search products...",
-                    prefixIcon: Icon(Icons.search),
-                    enabledBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(20),
-                      borderSide: BorderSide(color: kPrimaryGreen, width: 3.0),
-                    ),
-                    focusedBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(20),
-                      borderSide: BorderSide(color: kPrimaryGreen, width: 3.5),
-                    ),
-                  ),
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.fromLTRB(16.0, 2.0, 16.0, 8.0),
-                child: Container(
-                  width: double.infinity,
-                  height: 55,
-                  decoration: BoxDecoration(
-                    color: Colors.green,
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    spacing: 10,
-                    children: [
-                      Icon(
-                        Icons.card_travel_rounded,
-                        color: Colors.white,
-                        size: 35,
-                      ),
-                      CircleAvatar(
-                        child: Text(
-                          "1",
-                          style: kTitleStyle.copyWith(
-                            color: Colors.white,
-                            fontSize: 25,
-                          ),
-                        ),
-                      ),
-                      Text(
-                        "Point :",
-                        style: kTitleStyle.copyWith(
-                          color: Colors.white,
-                          fontSize: 25,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-              GridView.builder(
-                shrinkWrap: true,
-                physics: NeverScrollableScrollPhysics(),
-                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 2,
-                  childAspectRatio: 0.6,
-                ),
-                itemCount: filteredProducts.length,
-                itemBuilder: (context, index) {
-                  final product = filteredProducts[index];
-                  return Padding(
-                    padding: const EdgeInsets.all(15.0),
-                    child: ImageCounterCard(
-                      imagepath: product.image,
-                      product: product.name,
-                      price: product.price.toString(),
-                      point: product.point.toString(),
-                    ),
-                  );
+      body: Center(
+        child: Column(
+          children: [
+            Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: TextField(
+                onChanged: (value) {
+                  setState(() {
+                    searchQuery = value; // your answer!
+                  });
                 },
+                decoration: InputDecoration(
+                  hintText: "Search products...",
+                  prefixIcon: Icon(Icons.search),
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(20),
+                    borderSide: BorderSide(color: kPrimaryGreen, width: 3.0),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(20),
+                    borderSide: BorderSide(color: kPrimaryGreen, width: 3.5),
+                  ),
+                ),
               ),
-            ],
-          ),
+            ),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16.0, 2.0, 16.0, 8.0),
+              child: Container(
+                width: double.infinity,
+                height: 55,
+                decoration: BoxDecoration(
+                  color: Colors.green,
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+
+                  spacing: 10,
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.only(top: 8.0),
+                      child: SizedBox(
+                        width: 50,
+                        height: 50,
+                        child: Stack(
+                          key: cartKey,
+                          children: [
+                            Positioned(
+                              child: Icon(
+                                Icons.card_travel_rounded,
+                                color: Colors.white,
+                                size: 35,
+                              ),
+                            ),
+                            Positioned(
+                              left: 20,
+                              child: CircleAvatar(
+                                backgroundColor: Colors.black,
+                                radius: 13.0,
+                                child: ValueListenableBuilder(
+                                  valueListenable: selectedIndex,
+                                  builder: (context, value, child) {
+                                    return Text(
+                                      '${selectedIndex.value}',
+                                      style: kTitleStyle.copyWith(
+                                        color: Colors.white,
+                                        fontSize: 15,
+                                      ),
+                                    );
+                                  },
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+
+                    Padding(
+                      padding: const EdgeInsets.only(left: 8.0),
+                      child: ValueListenableBuilder(
+                        valueListenable: selectedPoint,
+                        builder: (context, value, child) {
+                          return Text(
+                            "Point : %${selectedPoint.value.toStringAsFixed(2)}",
+                            style: kTitleStyle.copyWith(
+                              color: Colors.white,
+                              fontSize: 25,
+                            ),
+                          );
+                        },
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            Expanded(
+              child: SingleChildScrollView(
+                child: GridView.builder(
+                  shrinkWrap: true,
+                  physics: NeverScrollableScrollPhysics(),
+                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: 2,
+                    childAspectRatio: 0.6,
+                  ),
+                  itemCount: filteredProducts.length,
+                  itemBuilder: (context, index) {
+                    final product = filteredProducts[index];
+                    return Padding(
+                      padding: const EdgeInsets.all(15.0),
+                      child: ImageCounterCard(
+                        key: itemKeys[index],
+                        imagepath: product.image,
+                        product: product.name,
+                        price: product.price.toString(),
+                        point: product.point.toString(),
+                        onSelect: () => flyToCart(itemKeys[index], product.image),
+                        onSelect2: () => flyFromCart(itemKeys[index], product.image),// 👈 add this
+                      ),
+                    );
+                  },
+                ),
+              ),
+            ),
+          ],
         ),
       ),
     );
   }
+  void flyToCart(GlobalKey itemKey, String imagePath) {
+    final itemBox = itemKey.currentContext!.findRenderObject() as RenderBox;
+    final itemPos = itemBox.localToGlobal(Offset.zero);
+
+    final cartBox = cartKey.currentContext!.findRenderObject() as RenderBox;
+    final cartPos = cartBox.localToGlobal(Offset.zero);
+
+    final animController = AnimationController(
+      duration: Duration(milliseconds: 800),
+      vsync: this,
+    );
+
+    // position animation: item → cart
+    final posAnimation = Tween<Offset>(
+      begin: itemPos,
+      end: cartPos,
+    ).animate(CurvedAnimation(
+      parent: animController,
+      curve: Curves.easeInOut,
+    ));
+
+    // size animation: big → small
+    final sizeAnimation = Tween<double>(
+      begin: 80,
+      end: 10,
+    ).animate(CurvedAnimation(
+      parent: animController,
+      curve: Curves.easeInOut,
+    ));
+
+    late OverlayEntry entry;
+    entry = OverlayEntry(
+      builder: (context) => AnimatedBuilder(
+        animation: animController,
+        builder: (context, child) {
+          return Positioned(
+            left: posAnimation.value.dx,
+            top: posAnimation.value.dy,
+            child: Image.asset(
+              imagePath,
+              width: sizeAnimation.value,
+              height: sizeAnimation.value,
+            ),
+          );
+        },
+      ),
+    );
+
+    Overlay.of(context).insert(entry);
+
+    animController.forward().then((_) {
+      entry.remove();
+      animController.dispose();
+    });
+  }
+  void flyFromCart(GlobalKey itemKey, String imagePath) {
+    final itemBox = itemKey.currentContext!.findRenderObject() as RenderBox;
+    final itemPos = itemBox.localToGlobal(Offset.zero);
+
+    final cartBox = cartKey.currentContext!.findRenderObject() as RenderBox;
+    final cartPos = cartBox.localToGlobal(Offset.zero);
+
+    final animController = AnimationController(
+      duration: Duration(milliseconds: 800),
+      vsync: this,
+    );
+
+    // position animation: item → cart
+    final posAnimation = Tween<Offset>(
+      begin: cartPos,
+      end: itemPos,
+    ).animate(CurvedAnimation(
+      parent: animController,
+      curve: Curves.easeInOut,
+    ));
+
+    // size animation: big → small
+    final sizeAnimation = Tween<double>(
+      begin: 80,
+      end: 10,
+    ).animate(CurvedAnimation(
+      parent: animController,
+      curve: Curves.easeInOut,
+    ));
+
+    late OverlayEntry entry;
+    entry = OverlayEntry(
+      builder: (context) => AnimatedBuilder(
+        animation: animController,
+        builder: (context, child) {
+          return Positioned(
+            left: posAnimation.value.dx,
+            top: posAnimation.value.dy,
+            child: Image.asset(
+              imagePath,
+              width: sizeAnimation.value,
+              height: sizeAnimation.value,
+            ),
+          );
+        },
+      ),
+    );
+
+    Overlay.of(context).insert(entry);
+
+    animController.forward().then((_) {
+      entry.remove();
+      animController.dispose();
+    });
+  }
 }
+
+
+
