@@ -45,6 +45,9 @@ class Authprovider extends ChangeNotifier {
   String? phone;
   String? address;
   String? name;
+  String? point;
+  String? position;
+  String? discount;
 
   String get isemail => email ?? "No data";
 
@@ -53,6 +56,11 @@ class Authprovider extends ChangeNotifier {
   String get isaddress => address ?? "No data";
 
   String get isname => name ?? "No data";
+  String get ispoint => point ?? "No data";
+  String get isposition => position ?? "No data";
+  String get isdiscount => discount ?? "No data";
+
+  //
 
   //
   Future<void> getProfile() async {
@@ -75,6 +83,9 @@ class Authprovider extends ChangeNotifier {
         phone = data['phone']?.toString();
         address = data['address'];
         name = data['name'];
+        point = data['point']?.toString();
+        position = data['position']?.toString();
+        discount = data['discount']?.toString();
       } else {
         message = data['message'] ?? "Failed to load profile";
       }

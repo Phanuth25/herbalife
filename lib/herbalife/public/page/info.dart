@@ -30,12 +30,12 @@ class _InfoState extends State<Info> {
     return Scaffold(
       appBar: AppBar(
         automaticallyImplyLeading: false,
-        title: Center(
-          child: const Text(
-            "Herbalife",
-            style: TextStyle(fontWeight: FontWeight.bold, color: kPrimaryGreen),
-          ),
+        title: const Text(
+          "Herbalife",
+          style: TextStyle(fontWeight: FontWeight.bold, color: kPrimaryGreen),
         ),
+
+        actions: [Text("Point: ${authProvider.ispoint}pt, Discount: ${authProvider.isdiscount}%", style: kTitleStyle)],
       ),
       body: Center(
         child: Padding(
@@ -129,9 +129,7 @@ class _InfoState extends State<Info> {
                         onPressed: () {
                           Navigator.push(
                             context,
-                            MaterialPageRoute(
-                              builder: (context) => Product(),
-                            ),
+                            MaterialPageRoute(builder: (context) => Product()),
                           );
                         },
                         child: Text(
