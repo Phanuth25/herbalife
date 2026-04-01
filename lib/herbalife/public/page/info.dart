@@ -32,10 +32,10 @@ class _InfoState extends State<Info> {
         automaticallyImplyLeading: false,
         title: const Text(
           "Herbalife",
-          style: TextStyle(fontWeight: FontWeight.bold, color: kPrimaryGreen),
+          style: TextStyle(fontWeight: FontWeight.bold, color: kPrimaryGreen,fontSize: 25),
         ),
 
-        actions: [Text("Point: ${authProvider.ispoint}pt, Discount: ${authProvider.isdiscount}%", style: kTitleStyle)],
+        actions: [Text("Point: ${authProvider.ispoint}pt, Discount: ${authProvider.isdiscount}%", style: kTitleStyle.copyWith(fontSize: 18))],
       ),
       body: Center(
         child: Padding(
