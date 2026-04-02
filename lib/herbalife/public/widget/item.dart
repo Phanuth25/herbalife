@@ -11,6 +11,7 @@ class ImageCounterCard extends StatefulWidget {
   final String product;
   final String price;
   final String point;
+  final String id;
   final VoidCallback onSelect;
   final VoidCallback onSelect2;
 
@@ -22,6 +23,7 @@ class ImageCounterCard extends StatefulWidget {
     required this.point,
     required this.onSelect,
     required this.onSelect2,
+    required this.id,
   });
 
   @override
@@ -44,6 +46,8 @@ class _ImageCounterCardState extends State<ImageCounterCard> {
 
   @override
   Widget build(BuildContext context) {
+    final int userId = int.parse(context.watch<Authprovider>().id ?? '0');
+    final int productId = int.parse(widget.id);
     final authProvider = context.watch<Authprovider>();
 
     // Parse discount safely — handles "25.0" style strings
@@ -69,7 +73,7 @@ class _ImageCounterCardState extends State<ImageCounterCard> {
                   selectedIndex.value = selectedIndex.value - counter;
                   selectedPoint.value =
                       selectedPoint.value -
-                          (double.parse(widget.point) * counter);
+                      (double.parse(widget.point) * counter);
                   counter = 0;
                 }
               }),
@@ -140,7 +144,7 @@ class _ImageCounterCardState extends State<ImageCounterCard> {
                                   selectedIndex.value--;
                                   selectedPoint.value =
                                       selectedPoint.value -
-                                          double.parse(widget.point);
+                                      double.parse(widget.point);
                                   CartModel.items.removeLast();
                                 }
                               }
@@ -159,23 +163,38 @@ class _ImageCounterCardState extends State<ImageCounterCard> {
                             ),
                           ),
                           IconButton(
-                            onPressed: () => setState(() {
-                              widget.onSelect();
-                              counter++;
-                              // Use effectivePrice so cart always has the correct price
-                              CartModel.add(
-                                Product(
-                                  name: widget.product,
-                                  price: effectivePrice,
-                                  image: widget.imagepath,
-                                  point: double.parse(widget.point),
-                                ),
-                              );
-                              selectedIndex.value++;
-                              selectedPoint.value =
-                                  selectedPoint.value +
-                                      double.parse(widget.point);
-                            }),
+                            onPressed: () {
+                              setState(() {
+                                widget.onSelect();
+                                counter++;
+                                // Use effectivePrice so cart always has the correct price
+                                CartModel.add(
+                                  Product(
+                                    id: int.parse(widget.id),
+                                    name: widget.product,
+                                    price: effectivePrice,
+                                    image: widget.imagepath,
+                                    point: double.parse(widget.point),
+                                  ),
+                                );
+                                authProvider.postitem(
+                                  userId,
+                                  productId,
+                                  counter,
+                                );
+                                if (authProvider.message != null) {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(
+                                      content: Text(authProvider.message!),
+                                    ),
+                                  );
+                                }
+                                selectedIndex.value++;
+                                selectedPoint.value =
+                                    selectedPoint.value +
+                                    double.parse(widget.point);
+                              });
+                            },
                             icon: const Icon(
                               Icons.add,
                               color: Colors.red,

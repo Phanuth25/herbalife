@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:project2/herbalife/public/constants/Constants.dart';
-import 'package:project2/herbalife/public/page/product.dart';
 import 'package:project2/herbalife/public/widget/welcome.dart';
 import 'package:project2/herbalife/public/model/cart_model.dart';
 
@@ -38,10 +37,7 @@ class _CartState extends State<Cart> {
           child: InkWell(
             child: const Image(image: AssetImage("assets/images/Herblogo.png")),
             onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => Product()),
-              );
+
             },
           ),
         ),

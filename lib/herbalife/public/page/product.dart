@@ -7,7 +7,7 @@ import 'package:project2/herbalife/public/widget/item.dart';
 import 'package:project2/herbalife/public/page/cart.dart';
 
 class Product extends StatefulWidget {
-  const Product({super.key});
+  const Product(String? id, {super.key});
 
   @override
   State<Product> createState() => _ProductState();
@@ -198,6 +198,7 @@ class _ProductState extends State<Product> with TickerProviderStateMixin {
                   final keyIndex = index % itemKeys.length;
                   return ImageCounterCard(
                     key: itemKeys[keyIndex],
+                    id: product.id.toString(),
                     imagepath: product.image,
                     product: product.name,
                     price: product.price.toString(),

@@ -5,8 +5,8 @@ import 'package:project2/herbalife/public/provider/auth_provider.dart';
 import 'package:provider/provider.dart';
 
 class Info extends StatefulWidget {
-  final String? id; // Store the ID passed to constructor
-  const Info(this.id, {super.key});
+  final String? userId; // Store the ID passed to constructor
+  const Info(this.userId, {super.key});
 
   @override
   State<Info> createState() => _InfoState();
@@ -129,7 +129,7 @@ class _InfoState extends State<Info> {
                         onPressed: () {
                           Navigator.push(
                             context,
-                            MaterialPageRoute(builder: (context) => Product()),
+                            MaterialPageRoute(builder: (context) => Product(authProvider.userId)),
                           );
                         },
                         child: Text(

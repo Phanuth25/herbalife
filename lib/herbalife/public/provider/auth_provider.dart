@@ -10,6 +10,8 @@ class Authprovider extends ChangeNotifier {
   String? userId; // Store as String
   String? id; // Store as String
 
+  String get isUserid => userId ?? "No id";
+
   //
   Future<void> login(String userid, String password) async {
     message = "";
@@ -78,6 +80,7 @@ class Authprovider extends ChangeNotifier {
       final data = json.decode(response.body);
       if (response.statusCode == 200) {
         // Note: backend profile.js might not send 'message', so we check for it or set a default
+        id = data['id']?.toString();
         message = data['message'] ?? "Profile loaded";
         email = data['email'];
         phone = data['phone']?.toString();
@@ -95,5 +98,27 @@ class Authprovider extends ChangeNotifier {
       isLoading = false; // Set loading to false when done
       notifyListeners(); // Final notification to update UI with data or error
     }
+  }
+  //
+  Future<void> postitem(int userid,int product, int quantity) async {
+    message = "";
+  try{
+    final response = await http.post(
+      Uri.parse("$_accounturl/postitem"),
+      headers: {'Content-Type': 'application/json'},
+      body: jsonEncode({'userid': userid, 'product': product, 'quantity': quantity}),
+    );
+    final data = json.decode(response.body);
+    if (response.statusCode == 200) {
+      message = data['message'];
+    } else {
+      message = data['message'];
+    }
+  } catch (e) {
+    message = "Network failed: $e";
+  } finally {
+    isLoading = false;
+    notifyListeners();
+  }
   }
 }

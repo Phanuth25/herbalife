@@ -125,7 +125,7 @@ class _LoginState extends State<Login> {
                                       "Login successful") {
                                     Navigator.push(
                                       context,
-                                      MaterialPageRoute(builder: (context) => Info(authProvider.id)),
+                                      MaterialPageRoute(builder: (context) => Info(authProvider.userId)),
                                     );
                                   }
                                 }
