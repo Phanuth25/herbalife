@@ -51,6 +51,8 @@ class Authprovider extends ChangeNotifier {
   String? position;
   String? discount;
 
+  int? invoiceId;
+
   String get isemail => email ?? "No data";
 
   String get isphone => phone ?? "No data";
@@ -111,6 +113,7 @@ class Authprovider extends ChangeNotifier {
     final data = json.decode(response.body);
     if (response.statusCode == 200) {
       message = data['message'];
+      invoiceId = data['invoiceId']; // Optional: get the ID of the new row
     } else {
       message = data['message'];
     }
@@ -120,5 +123,25 @@ class Authprovider extends ChangeNotifier {
     isLoading = false;
     notifyListeners();
   }
+  }
+  Future<void> deleteitem(int invoiceId) async {
+    message = "";
+    try{
+      final response = await http.delete(
+        Uri.parse("$_accounturl/deleteitem/$invoiceId"),
+        headers: {'Content-Type': 'application/json'},
+      );
+      final data = json.decode(response.body);
+      if (response.statusCode == 200) {
+        message = data['message'];
+      } else {
+        message = data['message'];
+      }
+    } catch (e) {
+      message = "Network failed: $e";
+    } finally {
+      isLoading = false;
+      notifyListeners();
+    }
   }
 }

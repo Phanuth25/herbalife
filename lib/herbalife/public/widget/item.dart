@@ -46,9 +46,12 @@ class _ImageCounterCardState extends State<ImageCounterCard> {
 
   @override
   Widget build(BuildContext context) {
-    final int userId = int.parse(context.watch<Authprovider>().id ?? '0');
-    final int productId = int.parse(widget.id);
     final authProvider = context.watch<Authprovider>();
+    final int userId = int.parse(authProvider.id ?? '0');
+    final int productId = int.parse(widget.id);
+    
+    // FIX 1: invoiceId is already an int? in Authprovider. No need to parse it as String.
+    final int invoiceId = authProvider.invoiceId ?? 0;
 
     // Parse discount safely — handles "25.0" style strings
     int discount = 0;
@@ -136,19 +139,36 @@ class _ImageCounterCardState extends State<ImageCounterCard> {
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           IconButton(
-                            onPressed: () => setState(() {
-                              widget.onSelect2();
+                            // FIX 2: Added async to await the deletion process
+                            onPressed: () async {
                               if (counter > 0) {
-                                counter--;
+                                widget.onSelect2();
+                                setState(() {
+                                  counter--;
+                                });
                                 if (selectedIndex.value > 0) {
                                   selectedIndex.value--;
                                   selectedPoint.value =
                                       selectedPoint.value -
                                       double.parse(widget.point);
-                                  CartModel.items.removeLast();
+                                  
+                                  if (CartModel.items.isNotEmpty) {
+                                    CartModel.items.removeLast();
+                                  }
+
+                                  // FIX 3: Await the server response
+                                  await authProvider.deleteitem(invoiceId);
+                                  
+                                  if (mounted && authProvider.message != null) {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(
+                                        content: Text(authProvider.message!, style: kTitleStyle),
+                                      ),
+                                    );
+                                  }
                                 }
                               }
-                            }),
+                            },
                             icon: const Icon(
                               Icons.remove,
                               color: Colors.red,
@@ -163,37 +183,41 @@ class _ImageCounterCardState extends State<ImageCounterCard> {
                             ),
                           ),
                           IconButton(
-                            onPressed: () {
+                            // FIX 4: Added async to await the post process
+                            onPressed: () async {
+                              widget.onSelect();
                               setState(() {
-                                widget.onSelect();
                                 counter++;
-                                // Use effectivePrice so cart always has the correct price
-                                CartModel.add(
-                                  Product(
-                                    id: int.parse(widget.id),
-                                    name: widget.product,
-                                    price: effectivePrice,
-                                    image: widget.imagepath,
-                                    point: double.parse(widget.point),
+                              });
+                              // Use effectivePrice so cart always has the correct price
+                              CartModel.add(
+                                Product(
+                                  id: int.parse(widget.id),
+                                  name: widget.product,
+                                  price: effectivePrice,
+                                  image: widget.imagepath,
+                                  point: double.parse(widget.point),
+                                ),
+                              );
+
+                              await authProvider.postitem(
+                                userId,
+                                productId,
+                                counter,
+                              );
+
+                              if (mounted && authProvider.message != null) {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                    content: Text(authProvider.message!, style: kTitleStyle),
                                   ),
                                 );
-                                authProvider.postitem(
-                                  userId,
-                                  productId,
-                                  counter,
-                                );
-                                if (authProvider.message != null) {
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    SnackBar(
-                                      content: Text(authProvider.message!),
-                                    ),
-                                  );
-                                }
-                                selectedIndex.value++;
-                                selectedPoint.value =
-                                    selectedPoint.value +
-                                    double.parse(widget.point);
-                              });
+                              }
+                              
+                              selectedIndex.value++;
+                              selectedPoint.value =
+                                  selectedPoint.value +
+                                  double.parse(widget.point);
                             },
                             icon: const Icon(
                               Icons.add,
