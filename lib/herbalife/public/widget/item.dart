@@ -162,7 +162,7 @@ class _ImageCounterCardState extends State<ImageCounterCard> {
                                   if (mounted && authProvider.message != null) {
                                     ScaffoldMessenger.of(context).showSnackBar(
                                       SnackBar(
-                                        content: Text(authProvider.message!, style: kTitleStyle),
+                                        content: Text("Removed from cart", style: kTitleStyle),
                                       ),
                                     );
                                   }
@@ -209,7 +209,7 @@ class _ImageCounterCardState extends State<ImageCounterCard> {
                               if (mounted && authProvider.message != null) {
                                 ScaffoldMessenger.of(context).showSnackBar(
                                   SnackBar(
-                                    content: Text(authProvider.message!, style: kTitleStyle),
+                                    content: Text("Added to cart", style: kTitleStyle),
                                   ),
                                 );
                               }

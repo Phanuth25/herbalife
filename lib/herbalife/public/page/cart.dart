@@ -37,7 +37,7 @@ class _CartState extends State<Cart> {
           child: InkWell(
             child: const Image(image: AssetImage("assets/images/Herblogo.png")),
             onTap: () {
-
+              Navigator.pop(context);
             },
           ),
         ),

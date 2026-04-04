@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:project2/herbalife/l10n/app_localizations.dart';
 import 'package:project2/herbalife/public/constants/Constants.dart';
 import 'package:project2/herbalife/public/page/info.dart';
+import 'package:project2/herbalife/public/page/register.dart';
 import 'package:project2/herbalife/public/provider/auth_provider.dart';
 import 'package:provider/provider.dart';
 
@@ -45,7 +46,7 @@ class _LoginState extends State<Login> {
               const SizedBox(height: 20),
               Container(
                 width: 320,
-                height: 400,
+                height: 500,
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(20),
                   border: Border.all(color: kPrimaryGreen, width: 5),
@@ -146,6 +147,19 @@ class _LoginState extends State<Login> {
                                       ),
                               ),
                       ),
+                      const SizedBox(height: 20),
+
+                      LoginButton(
+                        label: "Register",
+                        isLoading: false,
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (context) => Register()),
+                          );
+                        },
+                      ),
+
                     ],
                   ),
                 ),
