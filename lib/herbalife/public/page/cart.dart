@@ -10,212 +10,464 @@ class Cart extends StatefulWidget {
   State<Cart> createState() => _CartState();
 }
 
-class _CartState extends State<Cart> {
+class _CartState extends State<Cart> with SingleTickerProviderStateMixin {
+  AnimationController? _animController;
+  Animation<double>? _fadeAnim;
+  Animation<Offset>? _slideAnim;
+
   @override
   void initState() {
     super.initState();
+    final ctrl = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 600),
+    );
+    _animController = ctrl;
+    _fadeAnim = CurvedAnimation(parent: ctrl, curve: Curves.easeOut);
+    _slideAnim = Tween<Offset>(
+      begin: const Offset(0, 0.06),
+      end: Offset.zero,
+    ).animate(CurvedAnimation(parent: ctrl, curve: Curves.easeOut));
+    ctrl.forward();
+  }
+
+  @override
+  void dispose() {
+    _animController?.dispose();
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    // Calculating totals inside build so they refresh if the list changes
-    double totalPrice = CartModel.items.fold(
-      0,
-      (sum, item) => sum + item.price,
-    );
-    double totalPoint = CartModel.items.fold(
-      0,
-      (sum, item) => sum + item.point,
-    );
+    double totalPrice = CartModel.items.fold(0, (sum, item) => sum + item.price);
+    double totalPoint = CartModel.items.fold(0, (sum, item) => sum + item.point);
 
     return Scaffold(
-      appBar: AppBar(
-        automaticallyImplyLeading: true,
-        leadingWidth: 200,
-        leading: Padding(
-          padding: const EdgeInsets.only(left: 20),
-          child: InkWell(
-            child: const Image(image: AssetImage("assets/images/Herblogo.png")),
-            onTap: () {
-              Navigator.pop(context);
-            },
-          ),
-        ),
-        actions: [
-          Container(
-            width: 80,
-            height: 40,
-            decoration: const BoxDecoration(color: Colors.green),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                const Icon(Icons.question_mark, color: Colors.white, size: 25),
-                Text("Help", style: kTitleStyle.copyWith(color: Colors.white)),
-              ],
-            ),
-          ),
-          InkWell(
-            onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => const Welcome()),
-              );
-            },
+      backgroundColor: const Color(0xFFF1F8F1),
+      body: Stack(
+        children: [
+          // ── decorative circles ───────────────────────────────────────
+          Positioned(
+            top: -80,
+            left: -60,
             child: Container(
-              width: 80,
-              height: 40,
-              decoration: const BoxDecoration(color: Colors.black),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const Icon(Icons.exit_to_app, color: Colors.white, size: 25),
-                  Text(
-                    "Exit",
-                    style: kTitleStyle.copyWith(color: Colors.white),
-                  ),
-                ],
+              width: 260,
+              height: 260,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: const Color(0xFF388E3C).withValues(alpha: 0.09),
               ),
             ),
           ),
-        ],
-      ),
-      body: Column(
-        children: [
-          const SizedBox(height: 20),
-          // Align(
-          //   alignment: Alignment.center,
-          //   child: Text(
-          //     "Please remember all of your",
-          //     style: kTitleStyle.copyWith(fontSize: 27),
-          //   ),
-          // ),
-          // Text(
-          //   "purchases are the price after discounted",
-          //   style: kTitleStyle,
-          // ),
-          Expanded(
-            child: ListView.builder(
-              itemCount: CartModel.items.length,
-              itemBuilder: (context, index) {
-                final item = CartModel.items[index];
-                return Padding(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 16.0,
-                    vertical: 4.0,
-                  ),
-                  child: Container(
-                    color: Colors.grey[300],
-                    child: ListTile(
-                      leading: Image.asset(item.image, width: 50),
-                      title: Text(
-                        item.name,
-                        style: TextStyle(
-                          fontFamily: 'KhmerFont',
-                          color: kPrimaryGreen,
-                        ),
-                      ),
-                      subtitle: Text(
-                        "\$${item.price.toStringAsFixed(2)}",
-                        style: kTitleStyle.copyWith(fontSize: 22),
-                      ),
-                      trailing: Text("${item.point} pts", style: kTitleStyle),
-                    ),
-                  ),
-                );
-              },
+          Positioned(
+            top: -40,
+            right: -80,
+            child: Container(
+              width: 200,
+              height: 200,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: const Color(0xFF81C784).withValues(alpha: 0.11),
+              ),
             ),
           ),
 
-          // --- Summary Section ---
-          Padding(
-            padding: const EdgeInsets.fromLTRB(16.0, 10.0, 16.0, 60.0),
-            child: IntrinsicHeight(
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  // Left Side: Point and Amount Rows
-                  Expanded(
-                    child: Column(
-                      children: [
-                        // Total Point Row
-                        Row(
-                          children: [
-                            Container(
-                              color: Colors.deepOrangeAccent,
-                              padding: const EdgeInsets.all(12.0),
-                              child: Text(
-                                "Total point:",
-                                style: kTitleStyle.copyWith(
-                                  color: Colors.white,
-                                  fontSize: 20,
-                                ),
-                              ),
+          SafeArea(
+            child: Column(
+              children: [
+                // ── custom header ────────────────────────────────────────
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(20, 12, 16, 8),
+                  child: Row(
+                    children: [
+                      // back / logo
+                      GestureDetector(
+                        onTap: () => Navigator.pop(context),
+                        child: Image.asset(
+                          "assets/images/Herblogo.png",
+                          height: 36,
+                        ),
+                      ),
+                      const Spacer(),
+
+                      // Help button
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 14, vertical: 8),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(20),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withValues(alpha: 0.06),
+                              blurRadius: 8,
+                              offset: const Offset(0, 2),
                             ),
-                            Expanded(
-                              child: Container(
-                                color: Colors.orange,
-                                padding: const EdgeInsets.all(12.0),
-                                child: Text(
-                                  "%${totalPoint.toString()}",
-                                  style: kTitleStyle.copyWith(
-                                    color: Colors.white,
-                                    fontSize: 20,
-                                  ),
-                                ),
+                          ],
+                        ),
+                        child: Row(
+                          children: [
+                            const Icon(Icons.help_outline_rounded,
+                                size: 16, color: Color(0xFF43A047)),
+                            const SizedBox(width: 5),
+                            Text(
+                              "Help",
+                              style: TextStyle(
+                                fontSize: 13,
+                                fontWeight: FontWeight.w600,
+                                color: Colors.grey.shade700,
                               ),
                             ),
                           ],
                         ),
-                        const SizedBox(height: 4), // Small gap between rows
-                        // Total Amount Row
-                        Row(
-                          children: [
-                            Container(
-                              width: 160,
-                              // Fixed width to align with top row label if needed
-                              color: Colors.deepOrangeAccent,
-                              padding: const EdgeInsets.all(12.0),
-                              child: Text(
-                                "Total amount:",
-                                style: kTitleStyle.copyWith(
+                      ),
+                      const SizedBox(width: 8),
+
+                      // Exit button
+                      GestureDetector(
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => const Welcome()),
+                          );
+                        },
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 14, vertical: 8),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFF1B5E20),
+                            borderRadius: BorderRadius.circular(20),
+                            boxShadow: [
+                              BoxShadow(
+                                color: const Color(0xFF1B5E20)
+                                    .withValues(alpha: 0.25),
+                                blurRadius: 8,
+                                offset: const Offset(0, 2),
+                              ),
+                            ],
+                          ),
+                          child: const Row(
+                            children: [
+                              Icon(Icons.exit_to_app_rounded,
+                                  size: 16, color: Colors.white),
+                              SizedBox(width: 5),
+                              Text(
+                                "Exit",
+                                style: TextStyle(
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.w600,
                                   color: Colors.white,
-                                  fontSize: 20,
                                 ),
                               ),
-                            ),
-                            Expanded(
-                              child: Container(
-                                color: Colors.orange,
-                                padding: const EdgeInsets.all(12.0),
-                                child: Text(
-                                  "\$${totalPrice.toStringAsFixed(2)}",
-                                  style: kTitleStyle.copyWith(
-                                    color: Colors.white,
-                                    fontSize: 20,
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ],
+                            ],
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+
+                // ── page title ───────────────────────────────────────────
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(20, 4, 20, 10),
+                  child: Row(
+                    children: [
+                      Container(
+                        width: 5,
+                        height: 22,
+                        decoration: BoxDecoration(
+                          color: kPrimaryGreen,
+                          borderRadius: BorderRadius.circular(4),
+                        ),
+                      ),
+                      const SizedBox(width: 10),
+                      Text(
+                        "My Cart  (${CartModel.items.length} items)",
+                        style: const TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w700,
+                          color: Color(0xFF1B5E20),
+                          letterSpacing: -0.3,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+
+                // ── cart items list ──────────────────────────────────────
+                Expanded(
+                  child: CartModel.items.isEmpty
+                      ? Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(Icons.shopping_cart_outlined,
+                            size: 64, color: Colors.grey.shade300),
+                        const SizedBox(height: 12),
+                        Text(
+                          "Your cart is empty",
+                          style: TextStyle(
+                            fontSize: 15,
+                            color: Colors.grey.shade400,
+                            fontWeight: FontWeight.w500,
+                          ),
                         ),
                       ],
                     ),
+                  )
+                      : FadeTransition(
+                    opacity:
+                    _fadeAnim ?? const AlwaysStoppedAnimation(1.0),
+                    child: SlideTransition(
+                      position: _slideAnim ??
+                          const AlwaysStoppedAnimation(Offset.zero),
+                      child: ListView.builder(
+                        physics: const BouncingScrollPhysics(),
+                        padding: const EdgeInsets.fromLTRB(20, 0, 20, 12),
+                        itemCount: CartModel.items.length,
+                        itemBuilder: (context, index) {
+                          final item = CartModel.items[index];
+                          return Container(
+                            margin: const EdgeInsets.only(bottom: 10),
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(16),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black
+                                      .withValues(alpha: 0.04),
+                                  blurRadius: 8,
+                                  offset: const Offset(0, 3),
+                                ),
+                              ],
+                            ),
+                            child: Padding(
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 12, vertical: 10),
+                              child: Row(
+                                children: [
+                                  // image
+                                  Container(
+                                    width: 54,
+                                    height: 54,
+                                    decoration: BoxDecoration(
+                                      color: const Color(0xFFF0F8F0),
+                                      borderRadius:
+                                      BorderRadius.circular(12),
+                                    ),
+                                    child: Image.asset(item.image,
+                                        fit: BoxFit.contain),
+                                  ),
+                                  const SizedBox(width: 12),
+                                  // name + price
+                                  Expanded(
+                                    child: Column(
+                                      crossAxisAlignment:
+                                      CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          item.name,
+                                          maxLines: 2,
+                                          overflow: TextOverflow.ellipsis,
+                                          style: const TextStyle(
+                                            fontFamily: 'KhmerFont',
+                                            color: Color(0xFF1B5E20),
+                                            fontSize: 13,
+                                            fontWeight: FontWeight.w700,
+                                          ),
+                                        ),
+                                        const SizedBox(height: 4),
+                                        Text(
+                                          "\$${item.price.toStringAsFixed(2)}",
+                                          style: const TextStyle(
+                                            fontSize: 15,
+                                            fontWeight: FontWeight.w800,
+                                            color: Color(0xFF2E7D32),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                  // points chip
+                                  Container(
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 8, vertical: 4),
+                                    decoration: BoxDecoration(
+                                      color: const Color(0xFFE8F5E9),
+                                      borderRadius:
+                                      BorderRadius.circular(20),
+                                    ),
+                                    child: Row(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        const Icon(Icons.stars_rounded,
+                                            size: 12,
+                                            color: Color(0xFF43A047)),
+                                        const SizedBox(width: 3),
+                                        Text(
+                                          "${item.point} pts",
+                                          style: const TextStyle(
+                                            fontSize: 11,
+                                            fontWeight: FontWeight.w700,
+                                            color: Color(0xFF2E7D32),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          );
+                        },
+                      ),
+                    ),
                   ),
-                  const SizedBox(width: 8),
-                  // Right Side: The kPrimaryGreen Container
-                  Container(
-                    width: 80,
+                ),
+
+                // ── summary card ─────────────────────────────────────────
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(20, 0, 20, 24),
+                  child: Container(
                     decoration: BoxDecoration(
-                      color: kPrimaryGreen,
-                      borderRadius: BorderRadius.circular(4),
-                    ),
-                    child: const Icon(
-                      Icons.shopping_basket,
                       color: Colors.white,
+                      borderRadius: BorderRadius.circular(20),
+                      boxShadow: [
+                        BoxShadow(
+                          color: const Color(0xFF388E3C).withValues(alpha: 0.12),
+                          blurRadius: 20,
+                          offset: const Offset(0, 6),
+                        ),
+                      ],
+                    ),
+                    child: Padding(
+                      padding: const EdgeInsets.all(16),
+                      child: Row(
+                        children: [
+                          // totals
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                // title
+                                Row(
+                                  children: [
+                                    Container(
+                                      width: 4,
+                                      height: 16,
+                                      decoration: BoxDecoration(
+                                        color: kPrimaryGreen,
+                                        borderRadius: BorderRadius.circular(2),
+                                      ),
+                                    ),
+                                    const SizedBox(width: 8),
+                                    const Text(
+                                      "Order Summary",
+                                      style: TextStyle(
+                                        fontSize: 13,
+                                        fontWeight: FontWeight.w700,
+                                        color: Color(0xFF1B5E20),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                const SizedBox(height: 12),
+                                // total points row
+                                Row(
+                                  mainAxisAlignment:
+                                  MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Text(
+                                      "Total Points",
+                                      style: TextStyle(
+                                        fontSize: 13,
+                                        color: Colors.grey.shade500,
+                                        fontWeight: FontWeight.w500,
+                                      ),
+                                    ),
+                                    Container(
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 10, vertical: 3),
+                                      decoration: BoxDecoration(
+                                        color: const Color(0xFFE8F5E9),
+                                        borderRadius: BorderRadius.circular(20),
+                                      ),
+                                      child: Text(
+                                        "${totalPoint.toStringAsFixed(0)} pts",
+                                        style: const TextStyle(
+                                          fontSize: 13,
+                                          fontWeight: FontWeight.w700,
+                                          color: Color(0xFF2E7D32),
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                const SizedBox(height: 8),
+                                // divider
+                                Divider(
+                                    color: Colors.grey.shade100, thickness: 1),
+                                const SizedBox(height: 8),
+                                // total amount row
+                                Row(
+                                  mainAxisAlignment:
+                                  MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Text(
+                                      "Total Amount",
+                                      style: TextStyle(
+                                        fontSize: 13,
+                                        color: Colors.grey.shade500,
+                                        fontWeight: FontWeight.w500,
+                                      ),
+                                    ),
+                                    Text(
+                                      "\$${totalPrice.toStringAsFixed(2)}",
+                                      style: const TextStyle(
+                                        fontSize: 18,
+                                        fontWeight: FontWeight.w800,
+                                        color: Color(0xFF1B5E20),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            ),
+                          ),
+                          const SizedBox(width: 16),
+                          // basket icon button
+                          Container(
+                            width: 56,
+                            height: 56,
+                            decoration: BoxDecoration(
+                              gradient: const LinearGradient(
+                                colors: [Color(0xFF2E7D32), Color(0xFF43A047)],
+                                begin: Alignment.topLeft,
+                                end: Alignment.bottomRight,
+                              ),
+                              borderRadius: BorderRadius.circular(16),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: const Color(0xFF2E7D32)
+                                      .withValues(alpha: 0.30),
+                                  blurRadius: 10,
+                                  offset: const Offset(0, 4),
+                                ),
+                              ],
+                            ),
+                            child: const Icon(
+                              Icons.shopping_basket_rounded,
+                              color: Colors.white,
+                              size: 26,
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
                   ),
-                ],
-              ),
+                ),
+              ],
             ),
           ),
         ],
