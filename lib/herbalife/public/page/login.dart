@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:project2/herbalife/l10n/app_localizations.dart';
 import 'package:project2/herbalife/public/constants/Constants.dart';
+import 'package:project2/herbalife/public/data/notifier.dart';
 import 'package:project2/herbalife/public/page/info.dart';
 import 'package:project2/herbalife/public/page/register.dart';
 import 'package:project2/herbalife/public/provider/auth_provider.dart';
 import 'package:provider/provider.dart';
+import 'package:project2/herbalife/public/provider/data_provider.dart';
 
 class Login extends StatefulWidget {
   const Login({super.key});
@@ -50,12 +52,11 @@ class _LoginState extends State<Login> with SingleTickerProviderStateMixin {
     final l10n = AppLocalizations.of(context)!;
     final authProvider = Provider.of<Authprovider>(context);
     final isKhmer = l10n.login != "Login";
-
+    final dataProvider = Provider.of<SecureStorageProvider>(context);
     return Scaffold(
       backgroundColor: const Color(0xFFF1F8F1),
       body: Stack(
         children: [
-          // ── decorative circles ───────────────────────────────────────
           Positioned(
             top: -80,
             left: -60,
@@ -92,8 +93,6 @@ class _LoginState extends State<Login> with SingleTickerProviderStateMixin {
               ),
             ),
           ),
-
-          // ── main content ─────────────────────────────────────────────
           SafeArea(
             child: SingleChildScrollView(
               physics: const BouncingScrollPhysics(),
@@ -107,12 +106,8 @@ class _LoginState extends State<Login> with SingleTickerProviderStateMixin {
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
                         const SizedBox(height: 24),
-
-                        // logo
                         Image.asset("assets/images/Herblogo.png", width: 180),
                         const SizedBox(height: 8),
-
-                        // card
                         Container(
                           width: double.infinity,
                           padding: const EdgeInsets.fromLTRB(24, 28, 24, 32),
@@ -130,7 +125,6 @@ class _LoginState extends State<Login> with SingleTickerProviderStateMixin {
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              // title block
                               Row(
                                 children: [
                                   Container(
@@ -174,8 +168,6 @@ class _LoginState extends State<Login> with SingleTickerProviderStateMixin {
                                 ],
                               ),
                               const SizedBox(height: 28),
-
-                              // ID field
                               _buildLabel(l10n.id.contains("ID") ? "Member ID" : l10n.id, isKhmer),
                               const SizedBox(height: 6),
                               _buildField(
@@ -185,8 +177,6 @@ class _LoginState extends State<Login> with SingleTickerProviderStateMixin {
                                 isKhmer: isKhmer,
                               ),
                               const SizedBox(height: 16),
-
-                              // Password field
                               _buildLabel(
                                 l10n.password.contains("Password") ? "Password" : l10n.password,
                                 isKhmer,
@@ -243,91 +233,108 @@ class _LoginState extends State<Login> with SingleTickerProviderStateMixin {
                                 ),
                               ),
                               const SizedBox(height: 28),
-
-                              // Login button
                               SizedBox(
                                 width: double.infinity,
                                 height: 52,
-                                child: ElevatedButton(
-                                  onPressed: authProvider.isLoading
-                                      ? null
-                                      : () async {
-                                    await authProvider.login(
-                                      _idController.text,
-                                      _passwordController.text,
-                                    );
-                                    if (authProvider.message != null) {
-                                      if (authProvider.message == "Login successful") {
-                                        Navigator.push(
-                                          context,
-                                          MaterialPageRoute(
-                                              builder: (context) =>
-                                                  Info(authProvider.userId)),
-                                        );
-                                      } else {
-                                        ScaffoldMessenger.of(context).showSnackBar(
-                                          SnackBar(
-                                            content: Row(
-                                              children: [
-                                                const Icon(Icons.error_outline,
-                                                    color: Colors.white, size: 20),
-                                                const SizedBox(width: 10),
-                                                Expanded(
-                                                  child: Text(
-                                                    authProvider.message!,
-                                                    style: const TextStyle(
-                                                        fontWeight: FontWeight.w500),
+                                child: ValueListenableBuilder(
+                                  valueListenable: isId,
+                                  builder: (context, value, child) {
+                                    return ValueListenableBuilder(
+                                      valueListenable: isUser,
+                                      builder: (context, value, child) {
+                                        return ElevatedButton(
+                                          onPressed: authProvider.isLoading
+                                              ? null
+                                              : () async {
+                                            await authProvider.login(
+                                              _idController.text,
+                                              _passwordController.text,
+                                            );
+
+                                            if (authProvider.message != null) {
+                                              if (authProvider.message == "Login successful") {
+                                                // Save critical data to Secure Storage
+                                                await dataProvider.writeSecureData('id', authProvider.id!);
+                                                await dataProvider.writeSecureData('userId', authProvider.userId!);
+                                                await dataProvider.writeSecureData('token', authProvider.userToken!);
+                                                await dataProvider.writeSecureData('password', _passwordController.text);
+                                                
+                                                // Update global ValueNotifiers
+                                                isId.value = authProvider.id!;
+                                                isUser.value = authProvider.userId!;
+
+                                                Navigator.push(
+                                                  context,
+                                                  MaterialPageRoute(
+                                                      builder: (context) =>
+                                                          Info(authProvider.userId)),
+                                                );
+                                              } else {
+                                                ScaffoldMessenger.of(context).showSnackBar(
+                                                  SnackBar(
+                                                    content: Row(
+                                                      children: [
+                                                        const Icon(Icons.error_outline,
+                                                            color: Colors.white, size: 20),
+                                                        const SizedBox(width: 10),
+                                                        Expanded(
+                                                          child: Text(
+                                                            authProvider.message!,
+                                                            style: const TextStyle(
+                                                                fontWeight: FontWeight.w500),
+                                                          ),
+                                                        ),
+                                                      ],
+                                                    ),
+                                                    backgroundColor: Colors.red.shade700,
+                                                    behavior: SnackBarBehavior.floating,
+                                                    shape: RoundedRectangleBorder(
+                                                        borderRadius: BorderRadius.circular(12)),
+                                                    duration: const Duration(seconds: 2),
                                                   ),
-                                                ),
-                                              ],
-                                            ),
-                                            backgroundColor: Colors.red.shade700,
-                                            behavior: SnackBarBehavior.floating,
+                                                );
+                                              }
+                                            }
+                                          },
+                                          style: ElevatedButton.styleFrom(
+                                            backgroundColor: kPrimaryGreen,
+                                            disabledBackgroundColor:
+                                            kPrimaryGreen.withValues(alpha: 0.5),
+                                            elevation: 0,
+                                            shadowColor: Colors.transparent,
                                             shape: RoundedRectangleBorder(
-                                                borderRadius: BorderRadius.circular(12)),
-                                            duration: const Duration(seconds: 2),
+                                                borderRadius: BorderRadius.circular(16)),
+                                          ),
+                                          child: authProvider.isLoading
+                                              ? const SizedBox(
+                                            width: 22,
+                                            height: 22,
+                                            child: CircularProgressIndicator(
+                                                strokeWidth: 2.5, color: Colors.white),
+                                          )
+                                              : Text(
+                                            l10n.enter,
+                                            style: isKhmer
+                                                ? const TextStyle(
+                                              color: Colors.white,
+                                              fontFamily: 'KhmerFont',
+                                              fontSize: 18,
+                                              fontWeight: FontWeight.bold,
+                                            )
+                                                : const TextStyle(
+                                              color: Colors.white,
+                                              fontSize: 16,
+                                              fontWeight: FontWeight.w700,
+                                              letterSpacing: 0.3,
+                                            ),
                                           ),
                                         );
                                       }
-                                    }
-                                  },
-                                  style: ElevatedButton.styleFrom(
-                                    backgroundColor: kPrimaryGreen,
-                                    disabledBackgroundColor:
-                                    kPrimaryGreen.withValues(alpha: 0.5),
-                                    elevation: 0,
-                                    shadowColor: Colors.transparent,
-                                    shape: RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.circular(16)),
-                                  ),
-                                  child: authProvider.isLoading
-                                      ? const SizedBox(
-                                    width: 22,
-                                    height: 22,
-                                    child: CircularProgressIndicator(
-                                        strokeWidth: 2.5, color: Colors.white),
-                                  )
-                                      : Text(
-                                    l10n.enter,
-                                    style: isKhmer
-                                        ? const TextStyle(
-                                      color: Colors.white,
-                                      fontFamily: 'KhmerFont',
-                                      fontSize: 18,
-                                      fontWeight: FontWeight.bold,
-                                    )
-                                        : const TextStyle(
-                                      color: Colors.white,
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.w700,
-                                      letterSpacing: 0.3,
-                                    ),
-                                  ),
+                                    );
+                                  }
                                 ),
                               ),
                               const SizedBox(height: 16),
-
-                              // Divider
                               Row(
                                 children: [
                                   Expanded(
@@ -350,8 +357,6 @@ class _LoginState extends State<Login> with SingleTickerProviderStateMixin {
                                 ],
                               ),
                               const SizedBox(height: 16),
-
-                              // Register button (outlined style)
                               SizedBox(
                                 width: double.infinity,
                                 height: 52,

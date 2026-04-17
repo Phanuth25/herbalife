@@ -6,4 +6,7 @@ class CartModel {
   static void add(Product product) {
     items.add(product);
   }
+   void remove(int id) {
+    items.removeWhere((item) => item.id == id);
+  }
 }

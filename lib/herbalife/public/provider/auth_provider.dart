@@ -3,14 +3,16 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import 'package:project2/herbalife/public/provider/data_provider.dart';
 
 class Authprovider extends ChangeNotifier {
+  final SecureStorageProvider dataProvider = SecureStorageProvider();
   String? message;
   bool isLoading = false;
   final String _accounturl = "http://10.0.2.2:3000/api";
   String? userToken;
-  String? userId; // Store as String
-  String? id; // Store as String
+  String? userId; // Store as String (Member ID)
+  String? id; // Store as String (Database Primary Key)
   File? image;
   String get isUserid => userId ?? "No id";
 
@@ -44,7 +46,7 @@ class Authprovider extends ChangeNotifier {
     }
   }
 
-  //
+  // Profile data
   String? email;
   String? phone;
   String? address;
@@ -56,37 +58,36 @@ class Authprovider extends ChangeNotifier {
   int? invoiceId;
 
   String get isemail => email ?? "No data";
-
   String get isphone => phone ?? "No data";
-
   String get isaddress => address ?? "No data";
-
   String get isname => name ?? "No data";
-
   String get ispoint => point ?? "No data";
-
   String get isposition => position ?? "No data";
-
   String get isdiscount => discount ?? "No data";
 
-  //
-
-  //
   Future<void> getProfile() async {
-    if (id == null) return; // Prevent calling if we don't have an ID
     message = "";
-    isLoading = true; // Set loading state first
-    notifyListeners(); // Notify listeners that loading has started
+    isLoading = true;
+    notifyListeners();
+
     try {
+      // Restore state from secure storage if variables are null (e.g. after app restart)
+      id ??= await dataProvider.readSecureData('id');
+      userToken ??= await dataProvider.readSecureData('token');
+
+      if (id == null) {
+        message = "No user ID found";
+        return;
+      }
+
       final response = await http.get(
         Uri.parse("$_accounturl/profile/$id"),
         headers: {
-          'Authorization': 'Bearer $userToken', // Standard practice
+          'Authorization': 'Bearer ${userToken ?? ""}',
         },
       );
       final data = json.decode(response.body);
       if (response.statusCode == 200) {
-        // Note: backend profile.js might not send 'message', so we check for it or set a default
         id = data['id']?.toString();
         message = data['message'] ?? "Profile loaded";
         email = data['email'];
@@ -102,12 +103,12 @@ class Authprovider extends ChangeNotifier {
     } catch (e) {
       message = "Network error $e";
     } finally {
-      isLoading = false; // Set loading to false when done
-      notifyListeners(); // Final notification to update UI with data or error
+      isLoading = false;
+      notifyListeners();
     }
   }
 
-  //
+  // Other methods...
   Future<void> postitem(int userid, int product, int quantity) async {
     message = "";
     try {
@@ -123,7 +124,7 @@ class Authprovider extends ChangeNotifier {
       final data = json.decode(response.body);
       if (response.statusCode == 200) {
         message = data['message'];
-        invoiceId = data['invoiceId']; // Optional: get the ID of the new row
+        invoiceId = data['invoiceId'];
       } else {
         message = data['message'];
       }
@@ -141,6 +142,7 @@ class Authprovider extends ChangeNotifier {
       final response = await http.delete(
         Uri.parse("$_accounturl/deleteitem/$invoiceId"),
         headers: {'Content-Type': 'application/json'},
+
       );
       final data = json.decode(response.body);
       if (response.statusCode == 200) {
@@ -155,8 +157,6 @@ class Authprovider extends ChangeNotifier {
       notifyListeners();
     }
   }
-
-  //
 
   Future<void> register(
     String name,
@@ -185,7 +185,6 @@ class Authprovider extends ChangeNotifier {
       final data = json.decode(response.body);
 
       if (response.statusCode == 200) {
-        // Backend returns "Registered successfully"
         message = "successfully"; 
         userId = data['userid']?.toString();
       } else {
@@ -199,7 +198,6 @@ class Authprovider extends ChangeNotifier {
     }
   }
 
-  //
   Future<void> register2(int userid, int password, int userids) async {
     message = "";
     isLoading = true;

@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:project2/herbalife/public/constants/Constants.dart';
+import 'package:project2/herbalife/public/page/payment_screen.dart';
+import 'package:project2/herbalife/public/provider/auth_provider.dart';
 import 'package:project2/herbalife/public/widget/welcome.dart';
 import 'package:project2/herbalife/public/model/cart_model.dart';
+import 'package:provider/provider.dart';
 
 class Cart extends StatefulWidget {
   const Cart({super.key});
@@ -39,8 +42,16 @@ class _CartState extends State<Cart> with SingleTickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
-    double totalPrice = CartModel.items.fold(0, (sum, item) => sum + item.price);
-    double totalPoint = CartModel.items.fold(0, (sum, item) => sum + item.point);
+    final authProvider = context.watch<Authprovider>();
+    final int invoiceId = authProvider.invoiceId ?? 0;
+    double totalPrice = CartModel.items.fold(
+      0,
+      (sum, item) => sum + item.price,
+    );
+    double totalPoint = CartModel.items.fold(
+      0,
+      (sum, item) => sum + item.point,
+    );
 
     return Scaffold(
       backgroundColor: const Color(0xFFF1F8F1),
@@ -93,7 +104,9 @@ class _CartState extends State<Cart> with SingleTickerProviderStateMixin {
                       // Help button
                       Container(
                         padding: const EdgeInsets.symmetric(
-                            horizontal: 14, vertical: 8),
+                          horizontal: 14,
+                          vertical: 8,
+                        ),
                         decoration: BoxDecoration(
                           color: Colors.white,
                           borderRadius: BorderRadius.circular(20),
@@ -107,8 +120,11 @@ class _CartState extends State<Cart> with SingleTickerProviderStateMixin {
                         ),
                         child: Row(
                           children: [
-                            const Icon(Icons.help_outline_rounded,
-                                size: 16, color: Color(0xFF43A047)),
+                            const Icon(
+                              Icons.help_outline_rounded,
+                              size: 16,
+                              color: Color(0xFF43A047),
+                            ),
                             const SizedBox(width: 5),
                             Text(
                               "Help",
@@ -125,42 +141,45 @@ class _CartState extends State<Cart> with SingleTickerProviderStateMixin {
 
                       // Exit button
                       GestureDetector(
-                        onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => const Welcome()),
-                          );
-                        },
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 14, vertical: 8),
-                          decoration: BoxDecoration(
-                            color: const Color(0xFF1B5E20),
-                            borderRadius: BorderRadius.circular(20),
-                            boxShadow: [
-                              BoxShadow(
-                                color: const Color(0xFF1B5E20)
-                                    .withValues(alpha: 0.25),
-                                blurRadius: 8,
-                                offset: const Offset(0, 2),
-                              ),
-                            ],
-                          ),
-                          child: const Row(
-                            children: [
-                              Icon(Icons.exit_to_app_rounded,
-                                  size: 16, color: Colors.white),
-                              SizedBox(width: 5),
-                              Text(
-                                "Exit",
-                                style: TextStyle(
-                                  fontSize: 13,
-                                  fontWeight: FontWeight.w600,
+                        child: InkWell(
+                          onTap: () => Navigator.pop(context),
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 14,
+                              vertical: 8,
+                            ),
+                            decoration: BoxDecoration(
+                              color: const Color(0xFF1B5E20),
+                              borderRadius: BorderRadius.circular(20),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: const Color(
+                                    0xFF1B5E20,
+                                  ).withValues(alpha: 0.25),
+                                  blurRadius: 8,
+                                  offset: const Offset(0, 2),
+                                ),
+                              ],
+                            ),
+                            child: Row(
+                              children: [
+                                const Icon(
+                                  Icons.exit_to_app_rounded,
+                                  size: 16,
                                   color: Colors.white,
                                 ),
-                              ),
-                            ],
+                                const SizedBox(width: 5),
+
+                                Text(
+                                  "Back",
+                                  style: TextStyle(
+                                    fontSize: 13,
+                                    fontWeight: FontWeight.w600,
+                                    color: Colors.white,
+                                  ),
+                                ),
+                              ],
+                            ),
                           ),
                         ),
                       ),
@@ -199,131 +218,167 @@ class _CartState extends State<Cart> with SingleTickerProviderStateMixin {
                 Expanded(
                   child: CartModel.items.isEmpty
                       ? Center(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(Icons.shopping_cart_outlined,
-                            size: 64, color: Colors.grey.shade300),
-                        const SizedBox(height: 12),
-                        Text(
-                          "Your cart is empty",
-                          style: TextStyle(
-                            fontSize: 15,
-                            color: Colors.grey.shade400,
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
-                      ],
-                    ),
-                  )
-                      : FadeTransition(
-                    opacity:
-                    _fadeAnim ?? const AlwaysStoppedAnimation(1.0),
-                    child: SlideTransition(
-                      position: _slideAnim ??
-                          const AlwaysStoppedAnimation(Offset.zero),
-                      child: ListView.builder(
-                        physics: const BouncingScrollPhysics(),
-                        padding: const EdgeInsets.fromLTRB(20, 0, 20, 12),
-                        itemCount: CartModel.items.length,
-                        itemBuilder: (context, index) {
-                          final item = CartModel.items[index];
-                          return Container(
-                            margin: const EdgeInsets.only(bottom: 10),
-                            decoration: BoxDecoration(
-                              color: Colors.white,
-                              borderRadius: BorderRadius.circular(16),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Colors.black
-                                      .withValues(alpha: 0.04),
-                                  blurRadius: 8,
-                                  offset: const Offset(0, 3),
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(
+                                Icons.shopping_cart_outlined,
+                                size: 64,
+                                color: Colors.grey.shade300,
+                              ),
+                              const SizedBox(height: 12),
+                              Text(
+                                "Your cart is empty",
+                                style: TextStyle(
+                                  fontSize: 15,
+                                  color: Colors.grey.shade400,
+                                  fontWeight: FontWeight.w500,
                                 ),
-                              ],
-                            ),
-                            child: Padding(
-                              padding: const EdgeInsets.symmetric(
-                                  horizontal: 12, vertical: 10),
-                              child: Row(
-                                children: [
-                                  // image
-                                  Container(
-                                    width: 54,
-                                    height: 54,
-                                    decoration: BoxDecoration(
-                                      color: const Color(0xFFF0F8F0),
-                                      borderRadius:
-                                      BorderRadius.circular(12),
-                                    ),
-                                    child: Image.asset(item.image,
-                                        fit: BoxFit.contain),
-                                  ),
-                                  const SizedBox(width: 12),
-                                  // name + price
-                                  Expanded(
-                                    child: Column(
-                                      crossAxisAlignment:
-                                      CrossAxisAlignment.start,
-                                      children: [
-                                        Text(
-                                          item.name,
-                                          maxLines: 2,
-                                          overflow: TextOverflow.ellipsis,
-                                          style: const TextStyle(
-                                            fontFamily: 'KhmerFont',
-                                            color: Color(0xFF1B5E20),
-                                            fontSize: 13,
-                                            fontWeight: FontWeight.w700,
-                                          ),
+                              ),
+                            ],
+                          ),
+                        )
+                      : FadeTransition(
+                          opacity:
+                              _fadeAnim ?? const AlwaysStoppedAnimation(1.0),
+                          child: SlideTransition(
+                            position:
+                                _slideAnim ??
+                                const AlwaysStoppedAnimation(Offset.zero),
+                            child: ListView.builder(
+                              physics: const BouncingScrollPhysics(),
+                              padding: const EdgeInsets.fromLTRB(20, 0, 20, 12),
+                              itemCount: CartModel.items.length,
+                              itemBuilder: (context, index) {
+                                final item = CartModel.items[index];
+                                return Container(
+                                  margin: const EdgeInsets.only(bottom: 10),
+                                  decoration: BoxDecoration(
+                                    color: Colors.white,
+                                    borderRadius: BorderRadius.circular(16),
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: Colors.black.withValues(
+                                          alpha: 0.04,
                                         ),
-                                        const SizedBox(height: 4),
-                                        Text(
-                                          "\$${item.price.toStringAsFixed(2)}",
-                                          style: const TextStyle(
-                                            fontSize: 15,
-                                            fontWeight: FontWeight.w800,
-                                            color: Color(0xFF2E7D32),
-                                          ),
-                                        ),
-                                      ],
-                                    ),
+                                        blurRadius: 8,
+                                        offset: const Offset(0, 3),
+                                      ),
+                                    ],
                                   ),
-                                  // points chip
-                                  Container(
+                                  child: Padding(
                                     padding: const EdgeInsets.symmetric(
-                                        horizontal: 8, vertical: 4),
-                                    decoration: BoxDecoration(
-                                      color: const Color(0xFFE8F5E9),
-                                      borderRadius:
-                                      BorderRadius.circular(20),
+                                      horizontal: 12,
+                                      vertical: 10,
                                     ),
                                     child: Row(
-                                      mainAxisSize: MainAxisSize.min,
                                       children: [
-                                        const Icon(Icons.stars_rounded,
-                                            size: 12,
-                                            color: Color(0xFF43A047)),
-                                        const SizedBox(width: 3),
-                                        Text(
-                                          "${item.point} pts",
-                                          style: const TextStyle(
-                                            fontSize: 11,
-                                            fontWeight: FontWeight.w700,
-                                            color: Color(0xFF2E7D32),
+                                        // image
+                                        Container(
+                                          width: 54,
+                                          height: 54,
+                                          decoration: BoxDecoration(
+                                            color: const Color(0xFFF0F8F0),
+                                            borderRadius: BorderRadius.circular(
+                                              12,
+                                            ),
+                                          ),
+                                          child: Image.asset(
+                                            item.image,
+                                            fit: BoxFit.contain,
+                                          ),
+                                        ),
+                                        const SizedBox(width: 12),
+                                        // name + price
+                                        Expanded(
+                                          child: Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              Text(
+                                                item.name,
+                                                maxLines: 2,
+                                                overflow: TextOverflow.ellipsis,
+                                                style: const TextStyle(
+                                                  fontFamily: 'KhmerFont',
+                                                  color: Color(0xFF1B5E20),
+                                                  fontSize: 13,
+                                                  fontWeight: FontWeight.w700,
+                                                ),
+                                              ),
+                                              const SizedBox(height: 4),
+                                              Text(
+                                                "\$${item.price.toStringAsFixed(2)}",
+                                                style: const TextStyle(
+                                                  fontSize: 15,
+                                                  fontWeight: FontWeight.w800,
+                                                  color: Color(0xFF2E7D32),
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                        // points chip
+                                        Container(
+                                          padding: const EdgeInsets.symmetric(
+                                            horizontal: 8,
+                                            vertical: 4,
+                                          ),
+                                          decoration: BoxDecoration(
+                                            color: const Color(0xFFE8F5E9),
+                                            borderRadius: BorderRadius.circular(
+                                              20,
+                                            ),
+                                          ),
+                                          child: Row(
+                                            mainAxisSize: MainAxisSize.min,
+                                            children: [
+                                              const Icon(
+                                                Icons.stars_rounded,
+                                                size: 12,
+                                                color: Color(0xFF43A047),
+                                              ),
+                                              const SizedBox(width: 3),
+                                              Text(
+                                                "${item.point} pts",
+                                                style: const TextStyle(
+                                                  fontSize: 11,
+                                                  fontWeight: FontWeight.w700,
+                                                  color: Color(0xFF2E7D32),
+                                                ),
+                                              ),
+                                              const SizedBox(width: 4),
+                                              Padding(
+                                                padding: const EdgeInsets.all(
+                                                  8.0,
+                                                ),
+                                                child: GestureDetector(
+                                                  onTap: () async {
+                                                    CartModel.items.removeAt(
+                                                      index,
+                                                    );
+                                                    await authProvider
+                                                        .deleteitem(invoiceId);
+                                                  },
+                                                  child: const Icon(
+                                                    Icons
+                                                        .delete_outline_rounded,
+                                                    size: 25,
+                                                    color: Colors.red,
+                                                  ),
+                                                ),
+                                              ),
+                                            ],
                                           ),
                                         ),
                                       ],
                                     ),
                                   ),
-                                ],
-                              ),
+                                );
+                              },
                             ),
-                          );
-                        },
-                      ),
-                    ),
-                  ),
+                          ),
+                        ),
                 ),
 
                 // ── summary card ─────────────────────────────────────────
@@ -335,7 +390,9 @@ class _CartState extends State<Cart> with SingleTickerProviderStateMixin {
                       borderRadius: BorderRadius.circular(20),
                       boxShadow: [
                         BoxShadow(
-                          color: const Color(0xFF388E3C).withValues(alpha: 0.12),
+                          color: const Color(
+                            0xFF388E3C,
+                          ).withValues(alpha: 0.12),
                           blurRadius: 20,
                           offset: const Offset(0, 6),
                         ),
@@ -376,7 +433,7 @@ class _CartState extends State<Cart> with SingleTickerProviderStateMixin {
                                 // total points row
                                 Row(
                                   mainAxisAlignment:
-                                  MainAxisAlignment.spaceBetween,
+                                      MainAxisAlignment.spaceBetween,
                                   children: [
                                     Text(
                                       "Total Points",
@@ -388,7 +445,9 @@ class _CartState extends State<Cart> with SingleTickerProviderStateMixin {
                                     ),
                                     Container(
                                       padding: const EdgeInsets.symmetric(
-                                          horizontal: 10, vertical: 3),
+                                        horizontal: 10,
+                                        vertical: 3,
+                                      ),
                                       decoration: BoxDecoration(
                                         color: const Color(0xFFE8F5E9),
                                         borderRadius: BorderRadius.circular(20),
@@ -407,12 +466,14 @@ class _CartState extends State<Cart> with SingleTickerProviderStateMixin {
                                 const SizedBox(height: 8),
                                 // divider
                                 Divider(
-                                    color: Colors.grey.shade100, thickness: 1),
+                                  color: Colors.grey.shade100,
+                                  thickness: 1,
+                                ),
                                 const SizedBox(height: 8),
                                 // total amount row
                                 Row(
                                   mainAxisAlignment:
-                                  MainAxisAlignment.spaceBetween,
+                                      MainAxisAlignment.spaceBetween,
                                   children: [
                                     Text(
                                       "Total Amount",
@@ -437,29 +498,56 @@ class _CartState extends State<Cart> with SingleTickerProviderStateMixin {
                           ),
                           const SizedBox(width: 16),
                           // basket icon button
-                          Container(
-                            width: 56,
-                            height: 56,
-                            decoration: BoxDecoration(
-                              gradient: const LinearGradient(
-                                colors: [Color(0xFF2E7D32), Color(0xFF43A047)],
-                                begin: Alignment.topLeft,
-                                end: Alignment.bottomRight,
-                              ),
-                              borderRadius: BorderRadius.circular(16),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: const Color(0xFF2E7D32)
-                                      .withValues(alpha: 0.30),
-                                  blurRadius: 10,
-                                  offset: const Offset(0, 4),
+                          InkWell(
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => const Welcome(),
                                 ),
-                              ],
-                            ),
-                            child: const Icon(
-                              Icons.shopping_basket_rounded,
-                              color: Colors.white,
-                              size: 26,
+                              );
+                            },
+                            child: InkWell(
+                              onTap: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => PaymentScreen(
+                                      amount: totalPrice,
+                                      billNumber: generateBillNumber(),
+                                    ),
+                                  ),
+                                );
+                              },
+                              child: Container(
+                                width: 56,
+                                height: 56,
+                                decoration: BoxDecoration(
+                                  gradient: const LinearGradient(
+                                    colors: [
+                                      Color(0xFF2E7D32),
+                                      Color(0xFF43A047),
+                                    ],
+                                    begin: Alignment.topLeft,
+                                    end: Alignment.bottomRight,
+                                  ),
+                                  borderRadius: BorderRadius.circular(16),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: const Color(
+                                        0xFF2E7D32,
+                                      ).withValues(alpha: 0.30),
+                                      blurRadius: 10,
+                                      offset: const Offset(0, 4),
+                                    ),
+                                  ],
+                                ),
+                                child: const Icon(
+                                  Icons.shopping_basket_rounded,
+                                  color: Colors.white,
+                                  size: 26,
+                                ),
+                              ),
                             ),
                           ),
                         ],
@@ -473,5 +561,11 @@ class _CartState extends State<Cart> with SingleTickerProviderStateMixin {
         ],
       ),
     );
+  }
+
+  String generateBillNumber() {
+    final now = DateTime.now();
+    // Result format: INV-20240522143005 (YearMonthDayHourMinuteSecond)
+    return "INV-${now.year}${now.month}${now.day}${now.hour}${now.minute}${now.second}";
   }
 }

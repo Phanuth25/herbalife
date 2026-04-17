@@ -21,7 +21,7 @@ class _ProductState extends State<Product> with TickerProviderStateMixin {
   final GlobalKey cartKey = GlobalKey();
   List<GlobalKey> itemKeys = List.generate(
     products.length,
-        (index) => GlobalKey(),
+    (index) => GlobalKey(),
   );
 
   @override
@@ -38,8 +38,10 @@ class _ProductState extends State<Product> with TickerProviderStateMixin {
   @override
   Widget build(BuildContext context) {
     final filteredProducts = products
-        .where((product) =>
-        product.name.toLowerCase().contains(searchQuery.toLowerCase()))
+        .where(
+          (product) =>
+              product.name.toLowerCase().contains(searchQuery.toLowerCase()),
+        )
         .toList();
 
     return Scaffold(
@@ -81,10 +83,7 @@ class _ProductState extends State<Product> with TickerProviderStateMixin {
                   child: Row(
                     children: [
                       // logo
-                      Image.asset(
-                        "assets/images/Herblogo.png",
-                        height: 36,
-                      ),
+                      Image.asset("assets/images/Herblogo.png", height: 36),
                       const Spacer(),
 
                       // Help button
@@ -92,7 +91,9 @@ class _ProductState extends State<Product> with TickerProviderStateMixin {
                         onTap: () {},
                         child: Container(
                           padding: const EdgeInsets.symmetric(
-                              horizontal: 14, vertical: 8),
+                            horizontal: 14,
+                            vertical: 8,
+                          ),
                           decoration: BoxDecoration(
                             color: Colors.white,
                             borderRadius: BorderRadius.circular(20),
@@ -106,8 +107,11 @@ class _ProductState extends State<Product> with TickerProviderStateMixin {
                           ),
                           child: Row(
                             children: [
-                              const Icon(Icons.help_outline_rounded,
-                                  size: 16, color: Color(0xFF43A047)),
+                              const Icon(
+                                Icons.help_outline_rounded,
+                                size: 16,
+                                color: Color(0xFF43A047),
+                              ),
                               const SizedBox(width: 5),
                               Text(
                                 "Help",
@@ -129,19 +133,23 @@ class _ProductState extends State<Product> with TickerProviderStateMixin {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                                builder: (context) => const Welcome()),
+                              builder: (context) => const Welcome(),
+                            ),
                           );
                         },
                         child: Container(
                           padding: const EdgeInsets.symmetric(
-                              horizontal: 14, vertical: 8),
+                            horizontal: 14,
+                            vertical: 8,
+                          ),
                           decoration: BoxDecoration(
                             color: const Color(0xFF1B5E20),
                             borderRadius: BorderRadius.circular(20),
                             boxShadow: [
                               BoxShadow(
-                                color: const Color(0xFF1B5E20)
-                                    .withValues(alpha: 0.25),
+                                color: const Color(
+                                  0xFF1B5E20,
+                                ).withValues(alpha: 0.25),
                                 blurRadius: 8,
                                 offset: const Offset(0, 2),
                               ),
@@ -149,8 +157,11 @@ class _ProductState extends State<Product> with TickerProviderStateMixin {
                           ),
                           child: const Row(
                             children: [
-                              Icon(Icons.exit_to_app_rounded,
-                                  size: 16, color: Colors.white),
+                              Icon(
+                                Icons.exit_to_app_rounded,
+                                size: 16,
+                                color: Colors.white,
+                              ),
                               SizedBox(width: 5),
                               Text(
                                 "Exit",
@@ -175,27 +186,39 @@ class _ProductState extends State<Product> with TickerProviderStateMixin {
                     controller: _searchController,
                     onChanged: (value) => setState(() => searchQuery = value),
                     style: const TextStyle(
-                        fontSize: 14, fontWeight: FontWeight.w500),
+                      fontSize: 14,
+                      fontWeight: FontWeight.w500,
+                    ),
                     decoration: InputDecoration(
                       hintText: "Search products...",
                       hintStyle: TextStyle(
-                          color: Colors.grey.shade400, fontSize: 13),
-                      prefixIcon: const Icon(Icons.search_rounded,
-                          size: 20, color: Color(0xFF43A047)),
+                        color: Colors.grey.shade400,
+                        fontSize: 13,
+                      ),
+                      prefixIcon: const Icon(
+                        Icons.search_rounded,
+                        size: 20,
+                        color: Color(0xFF43A047),
+                      ),
                       suffixIcon: searchQuery.isNotEmpty
                           ? GestureDetector(
-                        onTap: () {
-                          _searchController.clear();
-                          setState(() => searchQuery = "");
-                        },
-                        child: Icon(Icons.close_rounded,
-                            size: 18, color: Colors.grey.shade400),
-                      )
+                              onTap: () {
+                                _searchController.clear();
+                                setState(() => searchQuery = "");
+                              },
+                              child: Icon(
+                                Icons.close_rounded,
+                                size: 18,
+                                color: Colors.grey.shade400,
+                              ),
+                            )
                           : null,
                       filled: true,
                       fillColor: Colors.white,
                       contentPadding: const EdgeInsets.symmetric(
-                          vertical: 14, horizontal: 16),
+                        vertical: 14,
+                        horizontal: 16,
+                      ),
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(16),
                         borderSide: BorderSide.none,
@@ -203,12 +226,16 @@ class _ProductState extends State<Product> with TickerProviderStateMixin {
                       enabledBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(16),
                         borderSide: const BorderSide(
-                            color: Color(0xFFDCEEDC), width: 1.5),
+                          color: Color(0xFFDCEEDC),
+                          width: 1.5,
+                        ),
                       ),
                       focusedBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(16),
                         borderSide: const BorderSide(
-                            color: Color(0xFF43A047), width: 1.8),
+                          color: Color(0xFF43A047),
+                          width: 1.8,
+                        ),
                       ),
                     ),
                   ),
@@ -236,8 +263,9 @@ class _ProductState extends State<Product> with TickerProviderStateMixin {
                         borderRadius: BorderRadius.circular(18),
                         boxShadow: [
                           BoxShadow(
-                            color:
-                            const Color(0xFF2E7D32).withValues(alpha: 0.30),
+                            color: const Color(
+                              0xFF2E7D32,
+                            ).withValues(alpha: 0.30),
                             blurRadius: 12,
                             offset: const Offset(0, 4),
                           ),
@@ -326,8 +354,11 @@ class _ProductState extends State<Product> with TickerProviderStateMixin {
                           const Spacer(),
                           const Padding(
                             padding: EdgeInsets.only(right: 18),
-                            child: Icon(Icons.arrow_forward_ios_rounded,
-                                color: Colors.white70, size: 16),
+                            child: Icon(
+                              Icons.arrow_forward_ios_rounded,
+                              color: Colors.white70,
+                              size: 16,
+                            ),
                           ),
                         ],
                       ),
@@ -365,52 +396,56 @@ class _ProductState extends State<Product> with TickerProviderStateMixin {
                 Expanded(
                   child: filteredProducts.isEmpty
                       ? Center(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(Icons.search_off_rounded,
-                            size: 56,
-                            color: Colors.grey.shade300),
-                        const SizedBox(height: 12),
-                        Text(
-                          "No products found",
-                          style: TextStyle(
-                            fontSize: 15,
-                            color: Colors.grey.shade400,
-                            fontWeight: FontWeight.w500,
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(
+                                Icons.search_off_rounded,
+                                size: 56,
+                                color: Colors.grey.shade300,
+                              ),
+                              const SizedBox(height: 12),
+                              Text(
+                                "No products found",
+                                style: TextStyle(
+                                  fontSize: 15,
+                                  color: Colors.grey.shade400,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                            ],
                           ),
-                        ),
-                      ],
-                    ),
-                  )
+                        )
                       : GridView.builder(
-                    padding: const EdgeInsets.fromLTRB(16, 4, 16, 20),
-                    physics: const BouncingScrollPhysics(),
-                    gridDelegate:
-                    const SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: 2,
-                      childAspectRatio: 0.52,
-                      crossAxisSpacing: 12,
-                      mainAxisSpacing: 12,
-                    ),
-                    itemCount: filteredProducts.length,
-                    itemBuilder: (context, index) {
-                      final product = filteredProducts[index];
-                      final keyIndex = index % itemKeys.length;
-                      return ImageCounterCard(
-                        key: itemKeys[keyIndex],
-                        id: product.id.toString(),
-                        imagepath: product.image,
-                        product: product.name,
-                        price: product.price.toString(),
-                        point: product.point.toString(),
-                        onSelect: () => flyToCart(
-                            itemKeys[keyIndex], product.image),
-                        onSelect2: () => flyFromCart(
-                            itemKeys[keyIndex], product.image),
-                      );
-                    },
-                  ),
+                          padding: const EdgeInsets.fromLTRB(16, 4, 16, 20),
+                          physics: const BouncingScrollPhysics(),
+                          gridDelegate:
+                              const SliverGridDelegateWithFixedCrossAxisCount(
+                                crossAxisCount: 2,
+                                childAspectRatio: 0.52,
+                                crossAxisSpacing: 12,
+                                mainAxisSpacing: 12,
+                              ),
+                          itemCount: filteredProducts.length,
+                          itemBuilder: (context, index) {
+                            final product = filteredProducts[index];
+                            final keyIndex = index % itemKeys.length;
+                            return ImageCounterCard(
+                              key: itemKeys[keyIndex],
+                              id: product.id.toString(),
+                              imagepath: product.image,
+                              product: product.name,
+                              price: product.price.toString(),
+                              point: product.point.toString(),
+                              onSelect: () =>
+                                  flyToCart(itemKeys[keyIndex], product.image),
+                              onSelect2: () => flyFromCart(
+                                itemKeys[keyIndex],
+                                product.image,
+                              ),
+                            );
+                          },
+                        ),
                 ),
               ],
             ),
@@ -422,13 +457,11 @@ class _ProductState extends State<Product> with TickerProviderStateMixin {
 
   void flyToCart(GlobalKey itemKey, String imagePath) {
     if (itemKey.currentContext == null) return;
-    final itemBox =
-    itemKey.currentContext!.findRenderObject() as RenderBox;
+    final itemBox = itemKey.currentContext!.findRenderObject() as RenderBox;
     final itemPos = itemBox.localToGlobal(Offset.zero);
 
     if (cartKey.currentContext == null) return;
-    final cartBox =
-    cartKey.currentContext!.findRenderObject() as RenderBox;
+    final cartBox = cartKey.currentContext!.findRenderObject() as RenderBox;
     final cartPos = cartBox.localToGlobal(Offset.zero);
 
     final animController = AnimationController(
@@ -439,18 +472,12 @@ class _ProductState extends State<Product> with TickerProviderStateMixin {
     final posAnimation = Tween<Offset>(
       begin: itemPos,
       end: cartPos,
-    ).animate(CurvedAnimation(
-      parent: animController,
-      curve: Curves.easeInOut,
-    ));
+    ).animate(CurvedAnimation(parent: animController, curve: Curves.easeInOut));
 
     final sizeAnimation = Tween<double>(
       begin: 80,
       end: 10,
-    ).animate(CurvedAnimation(
-      parent: animController,
-      curve: Curves.easeInOut,
-    ));
+    ).animate(CurvedAnimation(parent: animController, curve: Curves.easeInOut));
 
     late OverlayEntry entry;
     entry = OverlayEntry(
@@ -479,13 +506,11 @@ class _ProductState extends State<Product> with TickerProviderStateMixin {
 
   void flyFromCart(GlobalKey itemKey, String imagePath) {
     if (itemKey.currentContext == null) return;
-    final itemBox =
-    itemKey.currentContext!.findRenderObject() as RenderBox;
+    final itemBox = itemKey.currentContext!.findRenderObject() as RenderBox;
     final itemPos = itemBox.localToGlobal(Offset.zero);
 
     if (cartKey.currentContext == null) return;
-    final cartBox =
-    cartKey.currentContext!.findRenderObject() as RenderBox;
+    final cartBox = cartKey.currentContext!.findRenderObject() as RenderBox;
     final cartPos = cartBox.localToGlobal(Offset.zero);
 
     final animController = AnimationController(
@@ -496,18 +521,12 @@ class _ProductState extends State<Product> with TickerProviderStateMixin {
     final posAnimation = Tween<Offset>(
       begin: cartPos,
       end: itemPos,
-    ).animate(CurvedAnimation(
-      parent: animController,
-      curve: Curves.easeInOut,
-    ));
+    ).animate(CurvedAnimation(parent: animController, curve: Curves.easeInOut));
 
     final sizeAnimation = Tween<double>(
       begin: 80,
       end: 10,
-    ).animate(CurvedAnimation(
-      parent: animController,
-      curve: Curves.easeInOut,
-    ));
+    ).animate(CurvedAnimation(parent: animController, curve: Curves.easeInOut));
 
     late OverlayEntry entry;
     entry = OverlayEntry(
