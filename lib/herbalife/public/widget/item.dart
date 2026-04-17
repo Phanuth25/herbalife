@@ -5,6 +5,7 @@ import 'package:project2/herbalife/public/model/cart_model.dart';
 import 'package:project2/herbalife/public/model/product_model.dart';
 import 'package:project2/herbalife/public/provider/auth_provider.dart';
 import 'package:provider/provider.dart';
+import 'dart:math';
 
 class ImageCounterCard extends StatefulWidget {
   final String imagepath;
@@ -72,7 +73,7 @@ class _ImageCounterCardState extends State<ImageCounterCard>
       if (!isSelected) {
         selectedIndex.value = selectedIndex.value - counter;
         selectedPoint.value =
-            selectedPoint.value - (double.parse(widget.point) * counter);
+            max(0,selectedPoint.value - (double.parse(widget.point) * counter));
         counter = 0;
       }
     });
@@ -114,7 +115,6 @@ class _ImageCounterCardState extends State<ImageCounterCard>
                           ? kPrimaryGreen
                           : const Color(0xFFDCEEDC),
                       width: isSelected ? 2.0 : 1.5,
-
                     ),
                     boxShadow: [
                       BoxShadow(
@@ -133,7 +133,8 @@ class _ImageCounterCardState extends State<ImageCounterCard>
                       // ── product image ──────────────────────────────
                       ClipRRect(
                         borderRadius: const BorderRadius.vertical(
-                            top: Radius.circular(18)),
+                          top: Radius.circular(18),
+                        ),
                         child: Stack(
                           children: [
                             Container(
@@ -157,8 +158,11 @@ class _ImageCounterCardState extends State<ImageCounterCard>
                                     color: Color(0xFF2E7D32),
                                     shape: BoxShape.circle,
                                   ),
-                                  child: const Icon(Icons.check_rounded,
-                                      color: Colors.white, size: 12),
+                                  child: const Icon(
+                                    Icons.check_rounded,
+                                    color: Colors.white,
+                                    size: 12,
+                                  ),
                                 ),
                               ),
                             // discount badge
@@ -168,7 +172,9 @@ class _ImageCounterCardState extends State<ImageCounterCard>
                                 left: 8,
                                 child: Container(
                                   padding: const EdgeInsets.symmetric(
-                                      horizontal: 7, vertical: 3),
+                                    horizontal: 7,
+                                    vertical: 3,
+                                  ),
                                   decoration: BoxDecoration(
                                     color: Colors.red.shade500,
                                     borderRadius: BorderRadius.circular(8),
@@ -239,7 +245,9 @@ class _ImageCounterCardState extends State<ImageCounterCard>
                             // points chip
                             Container(
                               padding: const EdgeInsets.symmetric(
-                                  horizontal: 8, vertical: 3),
+                                horizontal: 8,
+                                vertical: 3,
+                              ),
                               decoration: BoxDecoration(
                                 color: const Color(0xFFE8F5E9),
                                 borderRadius: BorderRadius.circular(20),
@@ -247,8 +255,11 @@ class _ImageCounterCardState extends State<ImageCounterCard>
                               child: Row(
                                 mainAxisSize: MainAxisSize.min,
                                 children: [
-                                  const Icon(Icons.stars_rounded,
-                                      size: 12, color: Color(0xFF43A047)),
+                                  const Icon(
+                                    Icons.stars_rounded,
+                                    size: 12,
+                                    color: Color(0xFF43A047),
+                                  ),
                                   const SizedBox(width: 3),
                                   Text(
                                     "${widget.point} pts",
@@ -276,7 +287,9 @@ class _ImageCounterCardState extends State<ImageCounterCard>
                               color: const Color(0xFFF5FBF5),
                               borderRadius: BorderRadius.circular(12),
                               border: Border.all(
-                                  color: const Color(0xFFDCEEDC), width: 1.5),
+                                color: const Color(0xFFDCEEDC),
+                                width: 1.5,
+                              ),
                             ),
                             child: Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -289,40 +302,50 @@ class _ImageCounterCardState extends State<ImageCounterCard>
                                       setState(() => counter--);
                                       if (selectedIndex.value > 0) {
                                         selectedIndex.value--;
-                                        selectedPoint.value = selectedPoint
-                                            .value -
+                                        selectedPoint.value =
+                                            selectedPoint.value -
                                             double.parse(widget.point);
                                         if (CartModel.items.isNotEmpty) {
                                           CartModel.items.removeLast();
                                         }
-                                        await authProvider
-                                            .deleteitem(invoiceId);
+                                        await authProvider.deleteitem(
+                                          invoiceId,
+                                        );
                                         if (mounted &&
                                             authProvider.message != null) {
-                                          ScaffoldMessenger.of(context)
-                                              .showSnackBar(
+                                          ScaffoldMessenger.of(
+                                            context,
+                                          ).showSnackBar(
                                             SnackBar(
-                                              content: Row(children: [
-                                                const Icon(
-                                                    Icons.remove_shopping_cart_rounded,
+                                              content: Row(
+                                                children: [
+                                                  const Icon(
+                                                    Icons
+                                                        .remove_shopping_cart_rounded,
                                                     color: Colors.white,
-                                                    size: 16),
-                                                const SizedBox(width: 8),
-                                                Text("Removed from cart",
+                                                    size: 16,
+                                                  ),
+                                                  const SizedBox(width: 8),
+                                                  Text(
+                                                    "Removed from cart",
                                                     style: TextStyle(
-                                                        fontWeight:
-                                                        FontWeight.w500)),
-                                              ]),
+                                                      fontWeight:
+                                                          FontWeight.w500,
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
                                               backgroundColor:
-                                              Colors.red.shade700,
+                                                  Colors.red.shade700,
                                               behavior:
-                                              SnackBarBehavior.floating,
+                                                  SnackBarBehavior.floating,
                                               shape: RoundedRectangleBorder(
-                                                  borderRadius:
-                                                  BorderRadius.circular(
-                                                      12)),
+                                                borderRadius:
+                                                    BorderRadius.circular(12),
+                                              ),
                                               duration: const Duration(
-                                                  seconds: 2),
+                                                seconds: 2,
+                                              ),
                                             ),
                                           );
                                         }
@@ -339,8 +362,11 @@ class _ImageCounterCardState extends State<ImageCounterCard>
                                         bottomLeft: Radius.circular(10),
                                       ),
                                     ),
-                                    child: Icon(Icons.remove_rounded,
-                                        color: Colors.red.shade400, size: 18),
+                                    child: Icon(
+                                      Icons.remove_rounded,
+                                      color: Colors.red.shade400,
+                                      size: 18,
+                                    ),
                                   ),
                                 ),
 
@@ -369,36 +395,48 @@ class _ImageCounterCardState extends State<ImageCounterCard>
                                       ),
                                     );
                                     await authProvider.postitem(
-                                        userId, productId, counter);
+                                      userId,
+                                      productId,
+                                      counter,
+                                    );
                                     if (mounted &&
                                         authProvider.message != null) {
-                                      ScaffoldMessenger.of(context)
-                                          .showSnackBar(
+                                      ScaffoldMessenger.of(
+                                        context,
+                                      ).showSnackBar(
                                         SnackBar(
-                                          content: Row(children: [
-                                            const Icon(
+                                          content: Row(
+                                            children: [
+                                              const Icon(
                                                 Icons.add_shopping_cart_rounded,
                                                 color: Colors.white,
-                                                size: 16),
-                                            const SizedBox(width: 8),
-                                            const Text("Added to cart",
+                                                size: 16,
+                                              ),
+                                              const SizedBox(width: 8),
+                                              const Text(
+                                                "Added to cart",
                                                 style: TextStyle(
-                                                    fontWeight:
-                                                    FontWeight.w500)),
-                                          ]),
-                                          backgroundColor:
-                                          const Color(0xFF2E7D32),
+                                                  fontWeight: FontWeight.w500,
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                          backgroundColor: const Color(
+                                            0xFF2E7D32,
+                                          ),
                                           behavior: SnackBarBehavior.floating,
                                           shape: RoundedRectangleBorder(
-                                              borderRadius:
-                                              BorderRadius.circular(12)),
-                                          duration:
-                                          const Duration(seconds: 2),
+                                            borderRadius: BorderRadius.circular(
+                                              12,
+                                            ),
+                                          ),
+                                          duration: const Duration(seconds: 2),
                                         ),
                                       );
                                     }
                                     selectedIndex.value++;
-                                    selectedPoint.value = selectedPoint.value +
+                                    selectedPoint.value =
+                                        selectedPoint.value +
                                         double.parse(widget.point);
                                   },
                                   child: Container(
@@ -411,15 +449,18 @@ class _ImageCounterCardState extends State<ImageCounterCard>
                                         bottomRight: Radius.circular(10),
                                       ),
                                     ),
-                                    child: const Icon(Icons.add_rounded,
-                                        color: Color(0xFF2E7D32), size: 18),
+                                    child: const Icon(
+                                      Icons.add_rounded,
+                                      color: Color(0xFF2E7D32),
+                                      size: 18,
+                                    ),
                                   ),
                                 ),
                               ],
                             ),
                           ),
                         ),
-                      ]
+                      ],
                     ],
                   ),
                 ),

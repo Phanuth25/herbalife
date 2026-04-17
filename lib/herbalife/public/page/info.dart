@@ -1,11 +1,18 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:project2/herbalife/public/constants/Constants.dart';
+import 'package:project2/herbalife/public/page/login.dart';
 import 'package:project2/herbalife/public/page/product.dart';
 import 'package:project2/herbalife/public/provider/auth_provider.dart';
+import 'package:project2/herbalife/public/provider/data_provider.dart';
 import 'package:provider/provider.dart';
+import 'package:image_picker/image_picker.dart';
 
 class Info extends StatefulWidget {
   final String? userId;
+
   const Info(this.userId, {super.key});
 
   @override
@@ -16,6 +23,8 @@ class _InfoState extends State<Info> with SingleTickerProviderStateMixin {
   AnimationController? _animController;
   Animation<double>? _fadeAnim;
   Animation<Offset>? _slideAnim;
+  File? _image;
+  final ImagePicker _picker = ImagePicker();
 
   @override
   void initState() {
@@ -32,8 +41,8 @@ class _InfoState extends State<Info> with SingleTickerProviderStateMixin {
     ).animate(CurvedAnimation(parent: controller, curve: Curves.easeOut));
     controller.forward();
 
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      context.read<Authprovider>().getProfile();
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      await context.read<Authprovider>().getProfile();
     });
   }
 
@@ -43,9 +52,41 @@ class _InfoState extends State<Info> with SingleTickerProviderStateMixin {
     super.dispose();
   }
 
+  Future<void> _pickPhoto() async {
+    final XFile? photo = await _picker.pickImage(source: ImageSource.gallery);
+    if (photo != null) {
+      setState(() {
+        _image = File(photo.path);
+      });
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: const Row(
+              children: [
+                Icon(Icons.check_circle_outline, color: Colors.white, size: 20),
+                SizedBox(width: 10),
+                Text(
+                  'Photo selected successfully!',
+                  style: TextStyle(fontWeight: FontWeight.w500),
+                ),
+              ],
+            ),
+            backgroundColor: const Color(0xFF2E7D32),
+            behavior: SnackBarBehavior.floating,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+            ),
+            duration: const Duration(seconds: 2),
+          ),
+        );
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final authProvider = context.watch<Authprovider>();
+    final dataProvider = Provider.of<SecureStorageProvider>(context);
 
     return Scaffold(
       backgroundColor: const Color(0xFFF1F8F1),
@@ -110,13 +151,17 @@ class _InfoState extends State<Info> with SingleTickerProviderStateMixin {
                       ),
                       Container(
                         padding: const EdgeInsets.symmetric(
-                            horizontal: 14, vertical: 8),
+                          horizontal: 14,
+                          vertical: 8,
+                        ),
                         decoration: BoxDecoration(
                           color: Colors.white,
                           borderRadius: BorderRadius.circular(20),
                           boxShadow: [
                             BoxShadow(
-                              color: const Color(0xFF388E3C).withValues(alpha: 0.12),
+                              color: const Color(
+                                0xFF388E3C,
+                              ).withValues(alpha: 0.12),
                               blurRadius: 10,
                               offset: const Offset(0, 3),
                             ),
@@ -124,8 +169,11 @@ class _InfoState extends State<Info> with SingleTickerProviderStateMixin {
                         ),
                         child: Row(
                           children: [
-                            const Icon(Icons.stars_rounded,
-                                size: 16, color: Color(0xFF43A047)),
+                            const Icon(
+                              Icons.stars_rounded,
+                              size: 16,
+                              color: Color(0xFF43A047),
+                            ),
                             const SizedBox(width: 6),
                             Text(
                               "${authProvider.ispoint}pt",
@@ -141,8 +189,11 @@ class _InfoState extends State<Info> with SingleTickerProviderStateMixin {
                               height: 14,
                               color: const Color(0xFFDCEEDC),
                             ),
-                            const Icon(Icons.local_offer_rounded,
-                                size: 15, color: Color(0xFF43A047)),
+                            const Icon(
+                              Icons.local_offer_rounded,
+                              size: 15,
+                              color: Color(0xFF43A047),
+                            ),
                             const SizedBox(width: 4),
                             Text(
                               "${authProvider.isdiscount}% off",
@@ -163,216 +214,356 @@ class _InfoState extends State<Info> with SingleTickerProviderStateMixin {
                 Expanded(
                   child: authProvider.isLoading
                       ? const Center(
-                    child: CircularProgressIndicator(
-                      color: Color(0xFF43A047),
-                      strokeWidth: 2.5,
-                    ),
-                  )
+                          child: CircularProgressIndicator(
+                            color: Color(0xFF43A047),
+                            strokeWidth: 2.5,
+                          ),
+                        )
                       : FadeTransition(
-                    opacity:
-                    _fadeAnim ?? const AlwaysStoppedAnimation(1.0),
-                    child: SlideTransition(
-                      position: _slideAnim ??
-                          const AlwaysStoppedAnimation(Offset.zero),
-                      child: SingleChildScrollView(
-                        physics: const BouncingScrollPhysics(),
-                        padding: const EdgeInsets.fromLTRB(24, 8, 24, 32),
-                        child: Column(
-                          children: [
-                            // hero image
-                            ClipRRect(
-                              borderRadius: BorderRadius.circular(20),
-                              child: Image.asset(
-                                'assets/images/herb2.png',
-                                width: double.infinity,
-                                height: 180,
-                                fit: BoxFit.cover,
-                              ),
-                            ),
-                            const SizedBox(height: 20),
-
-                            // greeting
-                            Align(
-                              alignment: Alignment.centerLeft,
-                              child: RichText(
-                                text: TextSpan(
-                                  children: [
-                                    TextSpan(
-                                      text: 'Hello, ',
-                                      style: TextStyle(
-                                        fontSize: 22,
-                                        fontWeight: FontWeight.w500,
-                                        color: Colors.grey.shade600,
-                                      ),
-                                    ),
-                                    TextSpan(
-                                      text: '${authProvider.isname}!',
-                                      style: const TextStyle(
-                                        fontSize: 22,
-                                        fontWeight: FontWeight.w800,
-                                        color: Color(0xFF1B5E20),
-                                        fontFamily: 'KhmerFont',
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ),
-
-                            // error message
-                            if (authProvider.message != null &&
-                                authProvider.message!.isNotEmpty &&
-                                authProvider.message != "Profile loaded")
-                              Container(
-                                margin: const EdgeInsets.only(top: 10),
-                                padding: const EdgeInsets.symmetric(
-                                    horizontal: 14, vertical: 10),
-                                decoration: BoxDecoration(
-                                  color: Colors.red.shade50,
-                                  borderRadius: BorderRadius.circular(12),
-                                  border: Border.all(
-                                      color: Colors.red.shade200),
-                                ),
-                                child: Row(
-                                  children: [
-                                    Icon(Icons.error_outline,
-                                        color: Colors.red.shade400,
-                                        size: 18),
-                                    const SizedBox(width: 8),
-                                    Expanded(
-                                      child: Text(
-                                        authProvider.message!,
-                                        style: TextStyle(
-                                            color: Colors.red.shade600,
-                                            fontSize: 13),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-
-                            const SizedBox(height: 20),
-
-                            // profile card
-                            Container(
-                              width: double.infinity,
-                              padding: const EdgeInsets.fromLTRB(
-                                  20, 22, 20, 22),
-                              decoration: BoxDecoration(
-                                color: Colors.white,
-                                borderRadius: BorderRadius.circular(24),
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: const Color(0xFF388E3C)
-                                        .withValues(alpha: 0.10),
-                                    blurRadius: 24,
-                                    offset: const Offset(0, 8),
-                                  ),
-                                ],
-                              ),
+                          opacity:
+                              _fadeAnim ?? const AlwaysStoppedAnimation(1.0),
+                          child: SlideTransition(
+                            position:
+                                _slideAnim ??
+                                const AlwaysStoppedAnimation(Offset.zero),
+                            child: SingleChildScrollView(
+                              physics: const BouncingScrollPhysics(),
+                              padding: const EdgeInsets.fromLTRB(24, 8, 24, 32),
                               child: Column(
-                                crossAxisAlignment:
-                                CrossAxisAlignment.start,
                                 children: [
-                                  // card title
-                                  Row(
+                                  // hero image
+                                  Stack(
                                     children: [
-                                      Container(
-                                        width: 5,
-                                        height: 28,
-                                        decoration: BoxDecoration(
-                                          color: kPrimaryGreen,
-                                          borderRadius:
-                                          BorderRadius.circular(4),
+                                      // photo avatar
+                                      Center(
+                                        child: GestureDetector(
+                                          onTap: _pickPhoto,
+                                          child: Stack(
+                                            alignment: Alignment.bottomRight,
+                                            children: [
+                                              Container(
+                                                width: 180,
+                                                height: 180,
+                                                decoration: BoxDecoration(
+                                                  shape: BoxShape.circle,
+                                                  color: const Color(0xFFE8F5E9),
+                                                  border: Border.all(
+                                                    color: kPrimaryGreen.withValues(alpha: 0.3),
+                                                    width: 3,
+                                                  ),
+                                                  boxShadow: [
+                                                    BoxShadow(
+                                                      color: const Color(0xFF388E3C).withValues(alpha: 0.15),
+                                                      blurRadius: 12,
+                                                      offset: const Offset(0, 4),
+                                                    ),
+                                                  ],
+                                                  image: _image != null
+                                                      ? DecorationImage(
+                                                    image: FileImage(_image!),
+                                                    fit: BoxFit.cover,
+                                                  )
+                                                      : null,
+                                                ),
+                                                child: _image == null
+                                                    ? Icon(Icons.person_rounded,
+                                                    size: 42,
+                                                    color: kPrimaryGreen.withValues(alpha: 0.5))
+                                                    : null,
+                                              ),
+                                              Container(
+                                                padding: const EdgeInsets.all(6),
+                                                decoration: BoxDecoration(
+                                                  color: kPrimaryGreen,
+                                                  shape: BoxShape.circle,
+                                                  border: Border.all(color: Colors.white, width: 2),
+                                                ),
+                                                child: const Icon(Icons.camera_alt_rounded,
+                                                    size: 20, color: Colors.white),
+                                              ),
+                                            ],
+                                          ),
                                         ),
                                       ),
-                                      const SizedBox(width: 10),
-                                      const Text(
-                                        'Profile Details',
-                                        style: TextStyle(
-                                          fontSize: 16,
-                                          fontWeight: FontWeight.w700,
-                                          color: Color(0xFF1B5E20),
-                                          letterSpacing: -0.3,
+                                      Positioned(
+                                        top: 5,
+                                        child: InkWell(
+                                          onTap: () {},
+                                          child: Icon(
+                                            Icons.change_circle,
+                                            color: Colors.white,
+                                          ),
                                         ),
                                       ),
                                     ],
                                   ),
-                                  const SizedBox(height: 18),
+                                  const SizedBox(height: 20),
 
-                                  _buildInfoRow(
-                                    icon: Icons.location_on_outlined,
-                                    label: 'Address',
-                                    value: authProvider.isaddress,
+                                  // greeting
+                                  Align(
+                                    alignment: Alignment.centerLeft,
+                                    child: RichText(
+                                      text: TextSpan(
+                                        children: [
+                                          TextSpan(
+                                            text: 'Hello, ',
+                                            style: TextStyle(
+                                              fontSize: 22,
+                                              fontWeight: FontWeight.w500,
+                                              color: Colors.grey.shade600,
+                                            ),
+                                          ),
+                                          TextSpan(
+                                            text: '${authProvider.isname}!',
+                                            style: const TextStyle(
+                                              fontSize: 22,
+                                              fontWeight: FontWeight.w800,
+                                              color: Color(0xFF1B5E20),
+                                              fontFamily: 'KhmerFont',
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
                                   ),
-                                  const SizedBox(height: 14),
-                                  _buildInfoRow(
-                                    icon: Icons.phone_outlined,
-                                    label: 'Phone',
-                                    value: '0${authProvider.isphone}',
+
+                                  // error message
+                                  if (authProvider.message != null &&
+                                      authProvider.message!.isNotEmpty &&
+                                      authProvider.message != "Profile loaded")
+                                    Container(
+                                      margin: const EdgeInsets.only(top: 10),
+                                      padding: const EdgeInsets.symmetric(
+                                        horizontal: 14,
+                                        vertical: 10,
+                                      ),
+                                      decoration: BoxDecoration(
+                                        color: Colors.red.shade50,
+                                        borderRadius: BorderRadius.circular(12),
+                                        border: Border.all(
+                                          color: Colors.red.shade200,
+                                        ),
+                                      ),
+                                      child: Row(
+                                        children: [
+                                          Icon(
+                                            Icons.error_outline,
+                                            color: Colors.red.shade400,
+                                            size: 18,
+                                          ),
+                                          const SizedBox(width: 8),
+                                          Expanded(
+                                            child: Text(
+                                              authProvider.message!,
+                                              style: TextStyle(
+                                                color: Colors.red.shade600,
+                                                fontSize: 13,
+                                              ),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+
+                                  const SizedBox(height: 20),
+
+                                  // profile card
+                                  Container(
+                                    width: double.infinity,
+                                    padding: const EdgeInsets.fromLTRB(
+                                      20,
+                                      22,
+                                      20,
+                                      22,
+                                    ),
+                                    decoration: BoxDecoration(
+                                      color: Colors.white,
+                                      borderRadius: BorderRadius.circular(24),
+                                      boxShadow: [
+                                        BoxShadow(
+                                          color: const Color(
+                                            0xFF388E3C,
+                                          ).withValues(alpha: 0.10),
+                                          blurRadius: 24,
+                                          offset: const Offset(0, 8),
+                                        ),
+                                      ],
+                                    ),
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        // card title
+                                        Row(
+                                          children: [
+                                            Container(
+                                              width: 5,
+                                              height: 28,
+                                              decoration: BoxDecoration(
+                                                color: kPrimaryGreen,
+                                                borderRadius:
+                                                    BorderRadius.circular(4),
+                                              ),
+                                            ),
+                                            const SizedBox(width: 10),
+                                            const Text(
+                                              'Profile Details',
+                                              style: TextStyle(
+                                                fontSize: 16,
+                                                fontWeight: FontWeight.w700,
+                                                color: Color(0xFF1B5E20),
+                                                letterSpacing: -0.3,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                        const SizedBox(height: 18),
+
+                                        _buildInfoRow(
+                                          icon: Icons.location_on_outlined,
+                                          label: 'Address',
+                                          value: authProvider.isaddress,
+                                        ),
+                                        const SizedBox(height: 14),
+                                        _buildInfoRow(
+                                          icon: Icons.phone_outlined,
+                                          label: 'Phone',
+                                          value: '0${authProvider.isphone}',
+                                        ),
+                                        const SizedBox(height: 14),
+                                        _buildInfoRow(
+                                          icon: Icons.mail_outline_rounded,
+                                          label: 'Email',
+                                          value: authProvider.isemail,
+                                        ),
+                                      ],
+                                    ),
                                   ),
-                                  const SizedBox(height: 14),
-                                  _buildInfoRow(
-                                    icon: Icons.mail_outline_rounded,
-                                    label: 'Email',
-                                    value: authProvider.isemail,
+
+                                  const SizedBox(height: 24),
+
+                                  // Continue button
+                                  SizedBox(
+                                    width: double.infinity,
+                                    height: 52,
+                                    child: ElevatedButton(
+                                      onPressed: () {
+                                        Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder: (context) =>
+                                                Product(authProvider.userId),
+                                          ),
+                                        );
+                                      },
+                                      style: ElevatedButton.styleFrom(
+                                        backgroundColor: kPrimaryGreen,
+                                        elevation: 0,
+                                        shadowColor: Colors.transparent,
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.circular(
+                                            16,
+                                          ),
+                                        ),
+                                      ),
+                                      child: Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
+                                        children: [
+                                          Text(
+                                            'Continue',
+                                            style: kTitleStyle.copyWith(
+                                              fontSize: 16,
+                                              color: Colors.white,
+                                              fontWeight: FontWeight.w700,
+                                              letterSpacing: 0.3,
+                                            ),
+                                          ),
+                                          const SizedBox(width: 8),
+                                          const Icon(
+                                            Icons.arrow_forward_rounded,
+                                            color: Colors.white,
+                                            size: 18,
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                  const SizedBox(height: 24),
+                                  SizedBox(
+                                    width: double.infinity,
+                                    height: 52,
+                                    child: ElevatedButton(
+                                      onPressed: () {
+                                        showDialog(
+                                          context: context,
+                                          builder: (BuildContext context) {
+                                            return AlertDialog(
+                                              title: const Text('Log out'),
+                                              content: const Text(
+                                                'Are you sure you want to log out?',
+                                              ),
+                                              actions: [
+                                                Row(
+                                                  children: [
+                                                    TextButton(
+                                                      onPressed: () {
+                                                        Navigator.push(
+                                                          context,
+                                                          MaterialPageRoute(
+                                                            builder:
+                                                                (context) =>
+                                                                    Login(),
+                                                          ),
+                                                        );
+                                                        dataProvider
+                                                            .clearSecureData();
+                                                      },
+                                                      child: const Text('Yes'),
+                                                    ),
+                                                    TextButton(
+                                                      onPressed: () =>
+                                                          Navigator.pop(
+                                                            context,
+                                                          ),
+                                                      // Closes the dialog
+                                                      child: const Text('No'),
+                                                    ),
+                                                  ],
+                                                ),
+                                              ],
+                                            );
+                                          },
+                                        );
+
+                                        // dataProvider.clearSecureData();
+                                      },
+                                      style: ElevatedButton.styleFrom(
+                                        backgroundColor: kPrimaryGreen,
+                                        elevation: 0,
+                                        shadowColor: Colors.transparent,
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.circular(
+                                            16,
+                                          ),
+                                        ),
+                                      ),
+                                      child: Text(
+                                        "Log out",
+                                        style: kTitleStyle.copyWith(
+                                          fontSize: 16,
+                                          color: Colors.white,
+                                          fontWeight: FontWeight.w700,
+                                          letterSpacing: 0.3,
+                                        ),
+                                      ),
+                                    ),
                                   ),
                                 ],
                               ),
                             ),
-
-                            const SizedBox(height: 24),
-
-                            // Continue button
-                            SizedBox(
-                              width: double.infinity,
-                              height: 52,
-                              child: ElevatedButton(
-                                onPressed: () {
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (context) =>
-                                          Product(authProvider.userId),
-                                    ),
-                                  );
-                                },
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: kPrimaryGreen,
-                                  elevation: 0,
-                                  shadowColor: Colors.transparent,
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius:
-                                    BorderRadius.circular(16),
-                                  ),
-                                ),
-                                child: Row(
-                                  mainAxisAlignment:
-                                  MainAxisAlignment.center,
-                                  children: [
-                                    Text(
-                                      'Continue',
-                                      style: kTitleStyle.copyWith(
-                                        fontSize: 16,
-                                        color: Colors.white,
-                                        fontWeight: FontWeight.w700,
-                                        letterSpacing: 0.3,
-                                      ),
-                                    ),
-                                    const SizedBox(width: 8),
-                                    const Icon(
-                                        Icons.arrow_forward_rounded,
-                                        color: Colors.white,
-                                        size: 18),
-                                  ],
-                                ),
-                              ),
-                            ),
-                          ],
+                          ),
                         ),
-                      ),
-                    ),
-                  ),
                 ),
               ],
             ),
@@ -412,12 +603,12 @@ class _InfoState extends State<Info> with SingleTickerProviderStateMixin {
               ),
               const SizedBox(height: 2),
               Text(
-                value,
                 style: const TextStyle(
                   fontSize: 14,
                   fontWeight: FontWeight.w600,
                   color: Color(0xFF1B5E20),
                 ),
+                value,
               ),
             ],
           ),
