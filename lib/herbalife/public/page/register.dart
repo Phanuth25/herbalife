@@ -2,6 +2,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:project2/herbalife/public/constants/Constants.dart';
+import 'package:project2/herbalife/public/page/register2.dart';
 import 'package:project2/herbalife/public/provider/auth_provider.dart';
 import 'package:provider/provider.dart';
 
@@ -12,7 +13,8 @@ class Register extends StatefulWidget {
   State<Register> createState() => _RegisterState();
 }
 
-class _RegisterState extends State<Register> with SingleTickerProviderStateMixin {
+class _RegisterState extends State<Register>
+    with SingleTickerProviderStateMixin {
   final TextEditingController nameController = TextEditingController();
   final TextEditingController addresssController = TextEditingController();
   final TextEditingController phoneController = TextEditingController();
@@ -52,12 +54,17 @@ class _RegisterState extends State<Register> with SingleTickerProviderStateMixin
               children: [
                 Icon(Icons.check_circle_outline, color: Colors.white, size: 20),
                 SizedBox(width: 10),
-                Text('Photo selected successfully!', style: TextStyle(fontWeight: FontWeight.w500)),
+                Text(
+                  'Photo selected successfully!',
+                  style: TextStyle(fontWeight: FontWeight.w500),
+                ),
               ],
             ),
             backgroundColor: const Color(0xFF2E7D32),
             behavior: SnackBarBehavior.floating,
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+            ),
             duration: const Duration(seconds: 2),
           ),
         );
@@ -119,7 +126,8 @@ class _RegisterState extends State<Register> with SingleTickerProviderStateMixin
                 child: FadeTransition(
                   opacity: _fadeAnim ?? const AlwaysStoppedAnimation(1.0),
                   child: SlideTransition(
-                    position: _slideAnim ?? const AlwaysStoppedAnimation(Offset.zero),
+                    position:
+                        _slideAnim ?? const AlwaysStoppedAnimation(Offset.zero),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
@@ -142,8 +150,11 @@ class _RegisterState extends State<Register> with SingleTickerProviderStateMixin
                                   ),
                                 ],
                               ),
-                              child: const Icon(Icons.arrow_back_ios_new_rounded,
-                                  size: 18, color: Color(0xFF2E7D32)),
+                              child: const Icon(
+                                Icons.arrow_back_ios_new_rounded,
+                                size: 18,
+                                color: Color(0xFF2E7D32),
+                              ),
                             ),
                           ),
                         ),
@@ -161,7 +172,9 @@ class _RegisterState extends State<Register> with SingleTickerProviderStateMixin
                             borderRadius: BorderRadius.circular(28),
                             boxShadow: [
                               BoxShadow(
-                                color: const Color(0xFF388E3C).withValues(alpha: 0.10),
+                                color: const Color(
+                                  0xFF388E3C,
+                                ).withValues(alpha: 0.10),
                                 blurRadius: 30,
                                 offset: const Offset(0, 10),
                               ),
@@ -183,7 +196,8 @@ class _RegisterState extends State<Register> with SingleTickerProviderStateMixin
                                   ),
                                   const SizedBox(width: 12),
                                   Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
                                     children: [
                                       Text(
                                         'Create Account',
@@ -222,27 +236,35 @@ class _RegisterState extends State<Register> with SingleTickerProviderStateMixin
                                           shape: BoxShape.circle,
                                           color: const Color(0xFFE8F5E9),
                                           border: Border.all(
-                                            color: kPrimaryGreen.withValues(alpha: 0.3),
+                                            color: kPrimaryGreen.withValues(
+                                              alpha: 0.3,
+                                            ),
                                             width: 3,
                                           ),
                                           boxShadow: [
                                             BoxShadow(
-                                              color: const Color(0xFF388E3C).withValues(alpha: 0.15),
+                                              color: const Color(
+                                                0xFF388E3C,
+                                              ).withValues(alpha: 0.15),
                                               blurRadius: 12,
                                               offset: const Offset(0, 4),
                                             ),
                                           ],
                                           image: _image != null
                                               ? DecorationImage(
-                                            image: FileImage(_image!),
-                                            fit: BoxFit.cover,
-                                          )
+                                                  image: FileImage(_image!),
+                                                  fit: BoxFit.cover,
+                                                )
                                               : null,
                                         ),
                                         child: _image == null
-                                            ? Icon(Icons.person_rounded,
-                                            size: 42,
-                                            color: kPrimaryGreen.withValues(alpha: 0.5))
+                                            ? Icon(
+                                                Icons.person_rounded,
+                                                size: 42,
+                                                color: kPrimaryGreen.withValues(
+                                                  alpha: 0.5,
+                                                ),
+                                              )
                                             : null,
                                       ),
                                       Container(
@@ -250,10 +272,16 @@ class _RegisterState extends State<Register> with SingleTickerProviderStateMixin
                                         decoration: BoxDecoration(
                                           color: kPrimaryGreen,
                                           shape: BoxShape.circle,
-                                          border: Border.all(color: Colors.white, width: 2),
+                                          border: Border.all(
+                                            color: Colors.white,
+                                            width: 2,
+                                          ),
                                         ),
-                                        child: const Icon(Icons.camera_alt_rounded,
-                                            size: 14, color: Colors.white),
+                                        child: const Icon(
+                                          Icons.camera_alt_rounded,
+                                          size: 14,
+                                          color: Colors.white,
+                                        ),
                                       ),
                                     ],
                                   ),
@@ -263,7 +291,9 @@ class _RegisterState extends State<Register> with SingleTickerProviderStateMixin
                                 child: Padding(
                                   padding: const EdgeInsets.only(top: 8.0),
                                   child: Text(
-                                    _image == null ? 'Tap to add photo' : 'Photo selected ✓',
+                                    _image == null
+                                        ? 'Tap to add photo'
+                                        : 'Photo selected ✓',
                                     style: TextStyle(
                                       fontSize: 12,
                                       color: _image == null
@@ -323,110 +353,172 @@ class _RegisterState extends State<Register> with SingleTickerProviderStateMixin
                                   onPressed: authProvider.isLoading
                                       ? null
                                       : () async {
-                                    await authProvider.register(
-                                      nameController.text,
-                                      addresssController.text,
-                                      phoneController.text,
-                                      emailController.text,
-                                      _image!,
-                                    );
-                                    if (authProvider.message == "successfully") {
-                                      showDialog(
-                                        context: context,
-                                        barrierDismissible: false,
-                                        builder: (context) => AlertDialog(
-                                          shape: RoundedRectangleBorder(
-                                              borderRadius: BorderRadius.circular(20)),
-                                          title: Row(
-                                            children: [
-                                              Container(
-                                                padding: const EdgeInsets.all(8),
-                                                decoration: BoxDecoration(
-                                                  color: const Color(0xFFE8F5E9),
-                                                  borderRadius: BorderRadius.circular(10),
+                                          await authProvider.register(
+                                            nameController.text,
+                                            addresssController.text,
+                                            phoneController.text,
+                                            emailController.text,
+                                            _image!,
+                                          );
+                                          if (authProvider.message ==
+                                              "successfully") {
+                                            showDialog(
+                                              context: context,
+                                              barrierDismissible: false,
+                                              builder: (context) => AlertDialog(
+                                                shape: RoundedRectangleBorder(
+                                                  borderRadius:
+                                                      BorderRadius.circular(20),
                                                 ),
-                                                child: const Icon(Icons.check_circle_rounded,
-                                                    color: Color(0xFF2E7D32), size: 22),
-                                              ),
-                                              const SizedBox(width: 12),
-                                              const Text("Success!",
+                                                title: Row(
+                                                  children: [
+                                                    Container(
+                                                      padding:
+                                                          const EdgeInsets.all(
+                                                            8,
+                                                          ),
+                                                      decoration: BoxDecoration(
+                                                        color: const Color(
+                                                          0xFFE8F5E9,
+                                                        ),
+                                                        borderRadius:
+                                                            BorderRadius.circular(
+                                                              10,
+                                                            ),
+                                                      ),
+                                                      child: const Icon(
+                                                        Icons
+                                                            .check_circle_rounded,
+                                                        color: Color(
+                                                          0xFF2E7D32,
+                                                        ),
+                                                        size: 22,
+                                                      ),
+                                                    ),
+                                                    const SizedBox(width: 12),
+                                                    const Text(
+                                                      "Success!",
+                                                      style: TextStyle(
+                                                        fontWeight:
+                                                            FontWeight.w700,
+                                                        fontSize: 18,
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
+                                                content: const Text(
+                                                  "Your account has been created successfully. Now continue to create your Email&Password .",
                                                   style: TextStyle(
-                                                      fontWeight: FontWeight.w700,
-                                                      fontSize: 18)),
-                                            ],
-                                          ),
-                                          content: const Text(
-                                            "Your account has been created successfully.",
-                                            style: TextStyle(color: Colors.black54),
-                                          ),
-                                          actions: [
-                                            SizedBox(
-                                              width: double.infinity,
-                                              child: ElevatedButton(
-                                                onPressed: () => Navigator.pop(context),
-                                                style: ElevatedButton.styleFrom(
-                                                  backgroundColor: kPrimaryGreen,
-                                                  shape: RoundedRectangleBorder(
-                                                      borderRadius: BorderRadius.circular(12)),
-                                                  padding:
-                                                  const EdgeInsets.symmetric(vertical: 14),
+                                                    color: Colors.black54,
+                                                  ),
                                                 ),
-                                                child: const Text("Back to Login",
-                                                    style: TextStyle(
-                                                        color: Colors.white,
-                                                        fontWeight: FontWeight.w600)),
+                                                actions: [
+                                                  SizedBox(
+                                                    width: double.infinity,
+                                                    child: ElevatedButton(
+                                                      onPressed: () =>
+                                                          Navigator.push(
+                                                            context,
+                                                            MaterialPageRoute(
+                                                              builder:
+                                                                  (context) =>
+                                                                      Register2(),
+                                                            ),
+                                                          ),
+                                                      style: ElevatedButton.styleFrom(
+                                                        backgroundColor:
+                                                            kPrimaryGreen,
+                                                        shape: RoundedRectangleBorder(
+                                                          borderRadius:
+                                                              BorderRadius.circular(
+                                                                12,
+                                                              ),
+                                                        ),
+                                                        padding:
+                                                            const EdgeInsets.symmetric(
+                                                              vertical: 14,
+                                                            ),
+                                                      ),
+                                                      child: const Text(
+                                                        "Go to Section 2",
+                                                        style: TextStyle(
+                                                          color: Colors.white,
+                                                          fontWeight:
+                                                              FontWeight.w600,
+                                                        ),
+                                                      ),
+                                                    ),
+                                                  ),
+                                                ],
                                               ),
-                                            ),
-                                          ],
-                                        ),
-                                      );
-                                    } else {
-                                      ScaffoldMessenger.of(context).showSnackBar(
-                                        SnackBar(
-                                          content: Row(
-                                            children: [
-                                              const Icon(Icons.error_outline,
-                                                  color: Colors.white, size: 20),
-                                              const SizedBox(width: 10),
-                                              Expanded(
-                                                  child: Text(authProvider.message!,
-                                                      style: const TextStyle(
-                                                          fontWeight: FontWeight.w500))),
-                                            ],
-                                          ),
-                                          backgroundColor: Colors.red.shade700,
-                                          behavior: SnackBarBehavior.floating,
-                                          shape: RoundedRectangleBorder(
-                                              borderRadius: BorderRadius.circular(12)),
-                                          duration: const Duration(seconds: 2),
-                                        ),
-                                      );
-                                    }
-                                  },
+                                            );
+                                          } else {
+                                            ScaffoldMessenger.of(
+                                              context,
+                                            ).showSnackBar(
+                                              SnackBar(
+                                                content: Row(
+                                                  children: [
+                                                    const Icon(
+                                                      Icons.error_outline,
+                                                      color: Colors.white,
+                                                      size: 20,
+                                                    ),
+                                                    const SizedBox(width: 10),
+                                                    Expanded(
+                                                      child: Text(
+                                                        authProvider.message!,
+                                                        style: const TextStyle(
+                                                          fontWeight:
+                                                              FontWeight.w500,
+                                                        ),
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
+                                                backgroundColor:
+                                                    Colors.red.shade700,
+                                                behavior:
+                                                    SnackBarBehavior.floating,
+                                                shape: RoundedRectangleBorder(
+                                                  borderRadius:
+                                                      BorderRadius.circular(12),
+                                                ),
+                                                duration: const Duration(
+                                                  seconds: 2,
+                                                ),
+                                              ),
+                                            );
+                                          }
+                                        },
                                   style: ElevatedButton.styleFrom(
                                     backgroundColor: kPrimaryGreen,
-                                    disabledBackgroundColor: kPrimaryGreen.withValues(alpha: 0.5),
+                                    disabledBackgroundColor: kPrimaryGreen
+                                        .withValues(alpha: 0.5),
                                     elevation: 0,
                                     shadowColor: Colors.transparent,
                                     shape: RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.circular(16)),
+                                      borderRadius: BorderRadius.circular(16),
+                                    ),
                                   ),
                                   child: authProvider.isLoading
                                       ? const SizedBox(
-                                    width: 22,
-                                    height: 22,
-                                    child: CircularProgressIndicator(
-                                        strokeWidth: 2.5, color: Colors.white),
-                                  )
+                                          width: 22,
+                                          height: 22,
+                                          child: CircularProgressIndicator(
+                                            strokeWidth: 2.5,
+                                            color: Colors.white,
+                                          ),
+                                        )
                                       : const Text(
-                                    'Create Account',
-                                    style: TextStyle(
-                                      color: Colors.white,
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.w700,
-                                      letterSpacing: 0.3,
-                                    ),
-                                  ),
+                                          'Create Account',
+                                          style: TextStyle(
+                                            color: Colors.white,
+                                            fontSize: 16,
+                                            fontWeight: FontWeight.w700,
+                                            letterSpacing: 0.3,
+                                          ),
+                                        ),
                                 ),
                               ),
                             ],
@@ -473,7 +565,10 @@ class _RegisterState extends State<Register> with SingleTickerProviderStateMixin
         prefixIcon: Icon(icon, size: 20, color: const Color(0xFF43A047)),
         filled: true,
         fillColor: const Color(0xFFF5FBF5),
-        contentPadding: const EdgeInsets.symmetric(vertical: 15, horizontal: 16),
+        contentPadding: const EdgeInsets.symmetric(
+          vertical: 15,
+          horizontal: 16,
+        ),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(14),
           borderSide: BorderSide.none,

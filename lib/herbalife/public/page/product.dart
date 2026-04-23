@@ -2,9 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:project2/herbalife/public/constants/Constants.dart';
 import 'package:project2/herbalife/public/data/notifier.dart';
 import 'package:project2/herbalife/public/model/product_model.dart';
+import 'package:project2/herbalife/public/page/info.dart';
+import 'package:project2/herbalife/public/provider/auth_provider.dart';
 import 'package:project2/herbalife/public/widget/welcome.dart';
 import 'package:project2/herbalife/public/widget/item.dart';
 import 'package:project2/herbalife/public/page/cart.dart';
+import 'package:provider/provider.dart';
 
 class Product extends StatefulWidget {
   const Product(String? id, {super.key});
@@ -37,6 +40,8 @@ class _ProductState extends State<Product> with TickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
+    final authProvider = context.watch<Authprovider>();
+
     final filteredProducts = products
         .where(
           (product) =>
@@ -133,7 +138,8 @@ class _ProductState extends State<Product> with TickerProviderStateMixin {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (context) => const Welcome(),
+                              //here
+                              builder: (context) => Info(authProvider.userId),
                             ),
                           );
                         },
@@ -164,7 +170,7 @@ class _ProductState extends State<Product> with TickerProviderStateMixin {
                               ),
                               SizedBox(width: 5),
                               Text(
-                                "Exit",
+                                "Back",
                                 style: TextStyle(
                                   fontSize: 13,
                                   fontWeight: FontWeight.w600,
