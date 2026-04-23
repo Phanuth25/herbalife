@@ -8,7 +8,6 @@ import 'package:project2/herbalife/public/page/product.dart';
 import 'package:project2/herbalife/public/provider/auth_provider.dart';
 import 'package:project2/herbalife/public/provider/data_provider.dart';
 import 'package:provider/provider.dart';
-import 'package:image_picker/image_picker.dart';
 
 class Info extends StatefulWidget {
   final String? userId;
@@ -83,10 +82,23 @@ class _InfoState extends State<Info> with SingleTickerProviderStateMixin {
     }
   }
 
+  DecorationImage? _buildProfileImage(String? imageUrl) {
+    if (imageUrl != null) {
+      return DecorationImage(fit: BoxFit.cover, image: NetworkImage(imageUrl));
+    }
+    if (_image != null) {
+      return DecorationImage(fit: BoxFit.cover, image: FileImage(_image!));
+    }
+    return null;
+  }
+
   @override
   Widget build(BuildContext context) {
     final authProvider = context.watch<Authprovider>();
     final dataProvider = Provider.of<SecureStorageProvider>(context);
+    final imageUrl = authProvider.photo;
+    final profileImage = _buildProfileImage(imageUrl);
+    final showFallbackIcon = profileImage == null;
 
     return Scaffold(
       backgroundColor: const Color(0xFFF1F8F1),
@@ -246,40 +258,58 @@ class _InfoState extends State<Info> with SingleTickerProviderStateMixin {
                                                 height: 180,
                                                 decoration: BoxDecoration(
                                                   shape: BoxShape.circle,
-                                                  color: const Color(0xFFE8F5E9),
+                                                  color: const Color(
+                                                    0xFFE8F5E9,
+                                                  ),
                                                   border: Border.all(
-                                                    color: kPrimaryGreen.withValues(alpha: 0.3),
+                                                    color: kPrimaryGreen
+                                                        .withValues(alpha: 0.3),
                                                     width: 3,
                                                   ),
                                                   boxShadow: [
                                                     BoxShadow(
-                                                      color: const Color(0xFF388E3C).withValues(alpha: 0.15),
+                                                      color: const Color(
+                                                        0xFF388E3C,
+                                                      ).withValues(alpha: 0.15),
                                                       blurRadius: 12,
-                                                      offset: const Offset(0, 4),
+                                                      offset: const Offset(
+                                                        0,
+                                                        4,
+                                                      ),
                                                     ),
                                                   ],
-                                                  image: _image != null
-                                                      ? DecorationImage(
-                                                    image: FileImage(_image!),
-                                                    fit: BoxFit.cover,
-                                                  )
-                                                      : null,
+                                                  image: profileImage,
                                                 ),
-                                                child: _image == null
-                                                    ? Icon(Icons.person_rounded,
-                                                    size: 42,
-                                                    color: kPrimaryGreen.withValues(alpha: 0.5))
+
+                                                // here
+                                                child: showFallbackIcon
+                                                    ? Icon(
+                                                        Icons.person_rounded,
+                                                        size: 42,
+                                                        color: kPrimaryGreen
+                                                            .withValues(
+                                                              alpha: 0.5,
+                                                            ),
+                                                      )
                                                     : null,
                                               ),
                                               Container(
-                                                padding: const EdgeInsets.all(6),
+                                                padding: const EdgeInsets.all(
+                                                  6,
+                                                ),
                                                 decoration: BoxDecoration(
                                                   color: kPrimaryGreen,
                                                   shape: BoxShape.circle,
-                                                  border: Border.all(color: Colors.white, width: 2),
+                                                  border: Border.all(
+                                                    color: Colors.white,
+                                                    width: 2,
+                                                  ),
                                                 ),
-                                                child: const Icon(Icons.camera_alt_rounded,
-                                                    size: 20, color: Colors.white),
+                                                child: const Icon(
+                                                  Icons.camera_alt_rounded,
+                                                  size: 20,
+                                                  color: Colors.white,
+                                                ),
                                               ),
                                             ],
                                           ),
@@ -289,7 +319,7 @@ class _InfoState extends State<Info> with SingleTickerProviderStateMixin {
                                         top: 5,
                                         child: InkWell(
                                           onTap: () {},
-                                          child: Icon(
+                                          child: const Icon(
                                             Icons.change_circle,
                                             color: Colors.white,
                                           ),
@@ -511,9 +541,8 @@ class _InfoState extends State<Info> with SingleTickerProviderStateMixin {
                                                         Navigator.push(
                                                           context,
                                                           MaterialPageRoute(
-                                                            builder:
-                                                                (context) =>
-                                                                    Login(),
+                                                            builder: (context) =>
+                                                                const Login(),
                                                           ),
                                                         );
                                                         dataProvider
@@ -536,7 +565,7 @@ class _InfoState extends State<Info> with SingleTickerProviderStateMixin {
                                           },
                                         );
 
-                                        // dataProvider.clearSecureData();
+                                         dataProvider.clearSecureData();
                                       },
                                       style: ElevatedButton.styleFrom(
                                         backgroundColor: kPrimaryGreen,
@@ -603,12 +632,12 @@ class _InfoState extends State<Info> with SingleTickerProviderStateMixin {
               ),
               const SizedBox(height: 2),
               Text(
+                value,
                 style: const TextStyle(
                   fontSize: 14,
                   fontWeight: FontWeight.w600,
                   color: Color(0xFF1B5E20),
                 ),
-                value,
               ),
             ],
           ),

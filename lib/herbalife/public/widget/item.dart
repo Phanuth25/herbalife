@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:project2/herbalife/public/constants/Constants.dart';
 import 'package:project2/herbalife/public/data/notifier.dart';
-import 'package:project2/herbalife/public/model/cart_model.dart';
-import 'package:project2/herbalife/public/model/product_model.dart';
 import 'package:project2/herbalife/public/provider/auth_provider.dart';
 import 'package:provider/provider.dart';
 import 'dart:math';
@@ -35,6 +33,7 @@ class _ImageCounterCardState extends State<ImageCounterCard>
     with SingleTickerProviderStateMixin {
   bool isSelected = false;
   int counter = 0;
+  final List<int> _invoiceIds = [];
   AnimationController? _selectAnim;
   Animation<double>? _scaleAnim;
 
@@ -72,8 +71,10 @@ class _ImageCounterCardState extends State<ImageCounterCard>
       isSelected = !isSelected;
       if (!isSelected) {
         selectedIndex.value = selectedIndex.value - counter;
-        selectedPoint.value =
-            max(0,selectedPoint.value - (double.parse(widget.point) * counter));
+        selectedPoint.value = max(
+          0,
+          selectedPoint.value - (double.parse(widget.point) * counter),
+        );
         counter = 0;
       }
     });
@@ -85,7 +86,6 @@ class _ImageCounterCardState extends State<ImageCounterCard>
     final authProvider = context.watch<Authprovider>();
     final int userId = int.parse(authProvider.id ?? '0');
     final int productId = int.parse(widget.id);
-    final int invoiceId = authProvider.invoiceId ?? 0;
 
     int discount = 0;
     if (authProvider.discount != null) {
@@ -297,22 +297,25 @@ class _ImageCounterCardState extends State<ImageCounterCard>
                                 // minus
                                 GestureDetector(
                                   onTap: () async {
-                                    if (counter > 0) {
-                                      widget.onSelect2();
-                                      setState(() => counter--);
-                                      if (selectedIndex.value > 0) {
+                                    if (counter > 0 &&
+                                        _invoiceIds.isNotEmpty &&
+                                        selectedIndex.value > 0) {
+                                      final int invoiceId =
+                                          _invoiceIds.last;
+
+                                      await authProvider.deleteitem(invoiceId);
+
+                                      if (authProvider.message ==
+                                          "Removed successfully") {
+                                        widget.onSelect2();
+                                        _invoiceIds.removeLast();
+                                        setState(() => counter--);
                                         selectedIndex.value--;
                                         selectedPoint.value =
                                             selectedPoint.value -
                                             double.parse(widget.point);
-                                        if (CartModel.items.isNotEmpty) {
-                                          CartModel.items.removeLast();
-                                        }
-                                        await authProvider.deleteitem(
-                                          invoiceId,
-                                        );
-                                        if (mounted &&
-                                            authProvider.message != null) {
+
+                                        if (mounted) {
                                           ScaffoldMessenger.of(
                                             context,
                                           ).showSnackBar(
@@ -326,7 +329,7 @@ class _ImageCounterCardState extends State<ImageCounterCard>
                                                     size: 16,
                                                   ),
                                                   const SizedBox(width: 8),
-                                                  Text(
+                                                  const Text(
                                                     "Removed from cart",
                                                     style: TextStyle(
                                                       fontWeight:
@@ -383,61 +386,56 @@ class _ImageCounterCardState extends State<ImageCounterCard>
                                 // plus
                                 GestureDetector(
                                   onTap: () async {
-                                    widget.onSelect();
-                                    setState(() => counter++);
-                                    CartModel.add(
-                                      Product(
-                                        id: int.parse(widget.id),
-                                        name: widget.product,
-                                        price: effectivePrice,
-                                        image: widget.imagepath,
-                                        point: double.parse(widget.point),
-                                      ),
-                                    );
                                     await authProvider.postitem(
                                       userId,
                                       productId,
-                                      counter,
+                                      counter + 1,
                                     );
-                                    if (mounted &&
+                                    if (authProvider.invoiceId != null &&
                                         authProvider.message != null) {
-                                      ScaffoldMessenger.of(
-                                        context,
-                                      ).showSnackBar(
-                                        SnackBar(
-                                          content: Row(
-                                            children: [
-                                              const Icon(
-                                                Icons.add_shopping_cart_rounded,
-                                                color: Colors.white,
-                                                size: 16,
-                                              ),
-                                              const SizedBox(width: 8),
-                                              const Text(
-                                                "Added to cart",
-                                                style: TextStyle(
-                                                  fontWeight: FontWeight.w500,
+                                      widget.onSelect();
+                                      _invoiceIds.add(authProvider.invoiceId!);
+                                      setState(() => counter++);
+                                      selectedIndex.value++;
+                                      selectedPoint.value =
+                                          selectedPoint.value +
+                                          double.parse(widget.point);
+
+                                      if (mounted) {
+                                        ScaffoldMessenger.of(
+                                          context,
+                                        ).showSnackBar(
+                                          SnackBar(
+                                            content: Row(
+                                              children: [
+                                                const Icon(
+                                                  Icons.add_shopping_cart_rounded,
+                                                  color: Colors.white,
+                                                  size: 16,
                                                 ),
-                                              ),
-                                            ],
-                                          ),
-                                          backgroundColor: const Color(
-                                            0xFF2E7D32,
-                                          ),
-                                          behavior: SnackBarBehavior.floating,
-                                          shape: RoundedRectangleBorder(
-                                            borderRadius: BorderRadius.circular(
-                                              12,
+                                                const SizedBox(width: 8),
+                                                const Text(
+                                                  "Added to cart",
+                                                  style: TextStyle(
+                                                    fontWeight: FontWeight.w500,
+                                                  ),
+                                                ),
+                                              ],
                                             ),
+                                            backgroundColor: const Color(
+                                              0xFF2E7D32,
+                                            ),
+                                            behavior:
+                                                SnackBarBehavior.floating,
+                                            shape: RoundedRectangleBorder(
+                                              borderRadius:
+                                                  BorderRadius.circular(12),
+                                            ),
+                                            duration: const Duration(seconds: 2),
                                           ),
-                                          duration: const Duration(seconds: 2),
-                                        ),
-                                      );
+                                        );
+                                      }
                                     }
-                                    selectedIndex.value++;
-                                    selectedPoint.value =
-                                        selectedPoint.value +
-                                        double.parse(widget.point);
                                   },
                                   child: Container(
                                     width: 36,

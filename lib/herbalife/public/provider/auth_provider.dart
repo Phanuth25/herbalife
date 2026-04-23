@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:project2/herbalife/public/model/cart_model.dart';
 import 'dart:convert';
 import 'package:project2/herbalife/public/provider/data_provider.dart';
 
@@ -54,7 +55,9 @@ class Authprovider extends ChangeNotifier {
   String? point;
   String? position;
   String? discount;
-
+  String? photo;
+  String? TotalPoint;
+  String? TotalAmount;
   int? invoiceId;
 
   String get isemail => email ?? "No data";
@@ -97,6 +100,7 @@ class Authprovider extends ChangeNotifier {
         point = data['point']?.toString();
         position = data['position']?.toString();
         discount = data['discount']?.toString();
+        photo = data['photo'];
       } else {
         message = data['message'] ?? "Failed to load profile";
       }
@@ -111,6 +115,7 @@ class Authprovider extends ChangeNotifier {
   // Other methods...
   Future<void> postitem(int userid, int product, int quantity) async {
     message = "";
+    invoiceId = null;
     try {
       final response = await http.post(
         Uri.parse("$_accounturl/postitem"),
@@ -127,9 +132,11 @@ class Authprovider extends ChangeNotifier {
         invoiceId = data['invoiceId'];
       } else {
         message = data['message'];
+        invoiceId = null;
       }
     } catch (e) {
       message = "Network failed: $e";
+      invoiceId = null;
     } finally {
       isLoading = false;
       notifyListeners();
@@ -138,6 +145,8 @@ class Authprovider extends ChangeNotifier {
 
   Future<void> deleteitem(int invoiceId) async {
     message = "";
+    isLoading = true;
+    notifyListeners();
     try {
       final response = await http.delete(
         Uri.parse("$_accounturl/deleteitem/$invoiceId"),
@@ -147,6 +156,7 @@ class Authprovider extends ChangeNotifier {
       final data = json.decode(response.body);
       if (response.statusCode == 200) {
         message = data['message'];
+        cartItems.removeWhere((item) => item.id == invoiceId);
       } else {
         message = data['message'];
       }
@@ -221,6 +231,37 @@ class Authprovider extends ChangeNotifier {
       }
     } catch (e) {
       message = "Network failed";
+    } finally {
+      isLoading = false;
+      notifyListeners();
+    }
+  }
+
+  List<CartItemModel> cartItems = [];
+
+  Future<void> fetchCartItems() async {
+    isLoading = true;
+    notifyListeners();
+    try {
+      id ??= await dataProvider.readSecureData('id');
+      userToken ??= await dataProvider.readSecureData('token');
+
+      final response = await http.get(
+        Uri.parse('$_accounturl/getitem/$id'),
+        headers: {'Authorization': 'Bearer ${userToken ?? ""}'},
+      );
+
+      final data = json.decode(response.body);
+      print("API Response: $data"); // Check if 'data' array has items
+      if (response.statusCode == 200) {
+        final cart = CartModel.fromJson(data);
+        cartItems = cart.data;
+        message = cart.message;
+      } else {
+        message = data['message'];
+      }
+    } catch (e) {
+      message = "Network error: $e";
     } finally {
       isLoading = false;
       notifyListeners();
