@@ -35,7 +35,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
 
     // await because generateQR is now async
     await khqr.generateQR(
-      bakongID: 'yourname@wing',      // replace with your actual Bakong ID
+      bakongID:  'kimhak@dev',      // replace with your actual Bakong ID
       merchantName: auth.isname,
       amount: widget.amount,
       billNumber: widget.billNumber,
@@ -45,8 +45,8 @@ class _PaymentScreenState extends State<PaymentScreen> {
     if (khqr.qrString == null) return;
 
     // Poll every 3 seconds
-    _pollingTimer = Timer.periodic(const Duration(seconds: 3), (_) async {
-      await khqr.checkPayment(auth.userToken ?? '');
+    _pollingTimer = Timer.periodic(const Duration(seconds: 300), (_) async {
+      await khqr.checkPayment();
       if (khqr.isPaid) {
         _pollingTimer?.cancel();
         _expiryTimer?.cancel();

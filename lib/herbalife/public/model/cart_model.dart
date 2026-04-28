@@ -4,11 +4,7 @@ class CartModel {
   final String message;
   final List<CartItemModel> data;
 
-  CartModel({
-    required this.success,
-    required this.message,
-    required this.data,
-  });
+  CartModel({required this.success, required this.message, required this.data});
 
   factory CartModel.fromJson(Map<String, dynamic> json) {
     return CartModel(
@@ -26,9 +22,9 @@ class CartItemModel {
   final int id;
   final String name;
   final int product;
-  final int quantity;
+  int quantity;
   final String total;
-  final String point;
+  String point;
   final DateTime datetime;
 
   CartItemModel({

@@ -1,10 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:project2/herbalife/public/constants/Constants.dart';
-import 'package:project2/herbalife/public/data/notifier.dart';
 import 'package:project2/herbalife/public/model/product_model.dart';
 import 'package:project2/herbalife/public/page/info.dart';
 import 'package:project2/herbalife/public/provider/auth_provider.dart';
-import 'package:project2/herbalife/public/widget/welcome.dart';
 import 'package:project2/herbalife/public/widget/item.dart';
 import 'package:project2/herbalife/public/page/cart.dart';
 import 'package:provider/provider.dart';
@@ -30,6 +28,7 @@ class _ProductState extends State<Product> with TickerProviderStateMixin {
   @override
   void initState() {
     super.initState();
+    context.read<Authprovider>().fetchCartItems();
   }
 
   @override
@@ -41,7 +40,14 @@ class _ProductState extends State<Product> with TickerProviderStateMixin {
   @override
   Widget build(BuildContext context) {
     final authProvider = context.watch<Authprovider>();
-
+    final double totalPoint = authProvider.cartItems.fold(
+      0,
+      (sum, item) => sum + double.parse(item.point),
+    );
+    final int totalQty = authProvider.cartItems.fold(
+      0,
+      (sum, item) => sum + item.quantity,
+    );
     final filteredProducts = products
         .where(
           (product) =>
@@ -299,31 +305,27 @@ class _ProductState extends State<Product> with TickerProviderStateMixin {
                                 Positioned(
                                   left: 18,
                                   top: 0,
-                                  child: ValueListenableBuilder(
-                                    valueListenable: selectedIndex,
-                                    builder: (context, value, child) {
-                                      return Container(
-                                        width: 20,
-                                        height: 20,
-                                        decoration: BoxDecoration(
-                                          color: Colors.white,
-                                          shape: BoxShape.circle,
-                                          border: Border.all(
-                                            color: const Color(0xFF43A047),
-                                            width: 1.5,
-                                          ),
-                                        ),
-                                        alignment: Alignment.center,
-                                        child: Text(
-                                          '${selectedIndex.value}',
-                                          style: const TextStyle(
-                                            color: Color(0xFF2E7D32),
-                                            fontSize: 11,
-                                            fontWeight: FontWeight.w800,
-                                          ),
-                                        ),
-                                      );
-                                    },
+                                  child: Container(
+                                    width: 20,
+                                    height: 20,
+                                    decoration: BoxDecoration(
+                                      color: Colors.white,
+                                      shape: BoxShape.circle,
+                                      border: Border.all(
+                                        color: const Color(0xFF43A047),
+                                        width: 1.5,
+                                      ),
+                                    ),
+                                    alignment: Alignment.center,
+                                    child: Text(
+                                      //here
+                                      '$totalQty',
+                                      style: const TextStyle(
+                                        color: Color(0xFF2E7D32),
+                                        fontSize: 11,
+                                        fontWeight: FontWeight.w800,
+                                      ),
+                                    ),
                                   ),
                                 ),
                               ],
@@ -342,18 +344,13 @@ class _ProductState extends State<Product> with TickerProviderStateMixin {
                                   fontWeight: FontWeight.w500,
                                 ),
                               ),
-                              ValueListenableBuilder(
-                                valueListenable: selectedPoint,
-                                builder: (context, value, child) {
-                                  return Text(
-                                    "Points: ${selectedPoint.value.toStringAsFixed(2)}",
-                                    style: const TextStyle(
-                                      color: Colors.white,
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.w700,
-                                    ),
-                                  );
-                                },
+                              Text(
+                                "Points:$totalPoint",
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w700,
+                                ),
                               ),
                             ],
                           ),
