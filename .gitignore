@@ -73,3 +73,7 @@ lib/profile_figma.dart
 lib/trainer_figma.dart
 lib/shoulder_figma.dart
 lib/language_provider.dart
+
+.env
+lib/herbalife/private/.env
+lib/herbalife/node_modules/
