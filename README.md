@@ -96,6 +96,7 @@ flutter run
 ---
 
 ## 📁 Project Structure
+```
 lib/herbalife/
 ├── private/              # Node.js backend
 │   ├── controller/       # API route handlers
@@ -103,7 +104,8 @@ lib/herbalife/
 │   ├── .env.example      # Environment variable template
 │   └── server.js         # Entry point
 └── public/               # Flutter frontend
-├── page/             # Screens
-├── provider/         # State management
-├── model/            # Data models
-└── widget/           # Reusable widgets
+    ├── page/             # Screens
+    ├── provider/         # State management
+    ├── model/            # Data models
+    └── widget/           # Reusable widgets
+```
