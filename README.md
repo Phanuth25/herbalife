@@ -62,6 +62,7 @@ cd lib/herbalife/private
 cp .env.example .env
 ```
 Fill in your values in `.env`:
+```
 DB_HOST=localhost
 DB_USER=root
 DB_PASSWORD=your_mysql_password
@@ -70,7 +71,7 @@ CLOUDINARY_CLOUD_NAME=your_cloud_name
 CLOUDINARY_API_KEY=your_api_key
 CLOUDINARY_API_SECRET=your_api_secret
 JWT_SECRET=any_long_random_string
-
+```
 ### 4. Start the backend
 ```bash
 cd lib/herbalife
