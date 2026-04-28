@@ -37,6 +37,8 @@ class KhqrProvider extends ChangeNotifier {
         // CHANGE: Fixed enum name from KHQRCurrency to KhqrCurrency
         currency: KhqrCurrency.usd,
         billNumber: billNumber,
+        // Add this line
+        expirationTimestamp: DateTime.now().millisecondsSinceEpoch + (2 * 60 * 1000),
       );
 
       // CHANGE: Changed BakongKHQR() to KhqrSdk() and added await
@@ -61,9 +63,9 @@ class KhqrProvider extends ChangeNotifier {
       notifyListeners();
     }
   }
-
+  final String bakongToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJkYXRhIjp7ImlkIjoiOWUyOTA5OTg5Njc2NDE1OCJ9LCJpYXQiOjE3NzcyNTg0MDAsImV4cCI6MTc4NTAzNDQwMH0.dMc7bQK-FJUZ-KA67OWgoPHcAKzrOQqquAtXcL8qyH0";
   // Check payment status using md5 hash
-  Future<void> checkPayment(String token) async {
+  Future<void> checkPayment() async {
     if (md5Hash == null) return;
     message = "";
     isLoading = true;
@@ -73,7 +75,7 @@ class KhqrProvider extends ChangeNotifier {
         Uri.parse("https://api-bakong.nbc.gov.kh/v1/check_transaction_by_md5"),
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': 'Bearer $token',
+          'Authorization': 'Bearer $bakongToken',
           'Accept': 'application/json',
         },
         body: jsonEncode({'md5': md5Hash}),

@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 
 ValueNotifier<bool> isDark = ValueNotifier(false);
-ValueNotifier<int> selectedIndex = ValueNotifier(0);
-ValueNotifier<double> selectedPoint = ValueNotifier(0.0);
 ValueNotifier<String?> isId = ValueNotifier("");
 ValueNotifier<String?> isUser = ValueNotifier("");
 

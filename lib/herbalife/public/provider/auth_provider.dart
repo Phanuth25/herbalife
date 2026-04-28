@@ -15,6 +15,9 @@ class Authprovider extends ChangeNotifier {
   String? userId; // Store as String (Member ID)
   String? id; // Store as String (Database Primary Key)
   File? image;
+  int cartCount = 0;
+  double totalPoints = 0;
+
   String get isUserid => userId ?? "No id";
 
   //
@@ -61,11 +64,17 @@ class Authprovider extends ChangeNotifier {
   int? invoiceId;
 
   String get isemail => email ?? "No data";
+
   String get isphone => phone ?? "No data";
+
   String get isaddress => address ?? "No data";
+
   String get isname => name ?? "No data";
+
   String get ispoint => point ?? "No data";
+
   String get isposition => position ?? "No data";
+
   String get isdiscount => discount ?? "No data";
 
   Future<void> getProfile() async {
@@ -85,9 +94,7 @@ class Authprovider extends ChangeNotifier {
 
       final response = await http.get(
         Uri.parse("$_accounturl/profile/$id"),
-        headers: {
-          'Authorization': 'Bearer ${userToken ?? ""}',
-        },
+        headers: {'Authorization': 'Bearer ${userToken ?? ""}'},
       );
       final data = json.decode(response.body);
       if (response.statusCode == 200) {
@@ -111,7 +118,15 @@ class Authprovider extends ChangeNotifier {
       notifyListeners();
     }
   }
+  // In your auth provider
+  Map<int, int> productInvoiceMap = {};
 
+  // { productId: invoiceId }
+
+  void saveInvoiceId(int productId, int invoiceId) {
+    productInvoiceMap[productId] = invoiceId;
+    notifyListeners();
+  }
   // Other methods...
   Future<void> postitem(int userid, int product, int quantity) async {
     message = "";
@@ -130,9 +145,50 @@ class Authprovider extends ChangeNotifier {
       if (response.statusCode == 200) {
         message = data['message'];
         invoiceId = data['invoiceId'];
+        saveInvoiceId(product, invoiceId!);
+        await fetchCartItems(); // ← just re-fetch everything
       } else {
         message = data['message'];
         invoiceId = null;
+      }
+    } catch (e) {
+      message = "Network failed: $e";
+      invoiceId = null;
+    } finally {
+      isLoading = false;
+      notifyListeners();
+    }
+  }
+
+
+  int? getInvoiceId(int productId) {
+    return productInvoiceMap[productId];
+  }
+  void clearInvoiceId(int productId) {
+    productInvoiceMap.remove(productId);
+    notifyListeners();
+  }
+
+  Future<void> postitem2(int invoiceid, int quantity) async {
+    message = "";
+    invoiceId = null;
+    try {
+      final response = await http.patch(
+        Uri.parse("$_accounturl/postquantity"),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({'invoiceid': invoiceid, 'quantity': quantity}),
+      );
+      final data = json.decode(response.body);
+      if (response.statusCode == 200) {
+        message = data['message'];
+        // find the item and update its quantity in memory
+        final index = cartItems.indexWhere((item) => item.id == invoiceid);
+        if (index != -1) {
+          cartItems[index].quantity = quantity; // update in place
+          cartItems[index].point = point!;
+        }
+      } else {
+        message = data['message'];
       }
     } catch (e) {
       message = "Network failed: $e";
@@ -151,7 +207,6 @@ class Authprovider extends ChangeNotifier {
       final response = await http.delete(
         Uri.parse("$_accounturl/deleteitem/$invoiceId"),
         headers: {'Content-Type': 'application/json'},
-
       );
       final data = json.decode(response.body);
       if (response.statusCode == 200) {
@@ -179,23 +234,23 @@ class Authprovider extends ChangeNotifier {
     isLoading = true;
     notifyListeners();
     try {
-      var request = http.MultipartRequest('POST', Uri.parse("$_accounturl/register"));
+      var request = http.MultipartRequest(
+        'POST',
+        Uri.parse("$_accounturl/register"),
+      );
       request.fields['name'] = name;
       request.fields['address'] = address;
       request.fields['phone'] = phone;
       request.fields['email'] = email;
 
-      request.files.add(await http.MultipartFile.fromPath(
-        'image',
-        image.path,
-      ));
+      request.files.add(await http.MultipartFile.fromPath('image', image.path));
 
       var streamedResponse = await request.send();
       var response = await http.Response.fromStream(streamedResponse);
       final data = json.decode(response.body);
 
       if (response.statusCode == 200) {
-        message = "successfully"; 
+        message = "successfully";
         userId = data['userid']?.toString();
       } else {
         message = data['error'] ?? data['message'] ?? "Registration failed";
