@@ -77,3 +77,25 @@ lib/language_provider.dart
 .env
 lib/herbalife/private/.env
 lib/herbalife/node_modules/
+
+# Unrelated projects and files
+lib/homework/
+private/
+flutter_01.png
+flutter_02.png
+flutter_03.png
+lib/herbalife/note.txt
+
+# Unrelated assets
+assets/lotties/
+assets/rive/
+assets/images/gym.png
+assets/images/gym2.png
+assets/images/gym3.jpg
+assets/images/gym4.jpg
+assets/images/gym5.jpg
+assets/images/abs.png
+assets/images/back.png
+assets/images/chest.png
+assets/images/muscle.png
+assets/images/trainer.png
