@@ -62,6 +62,7 @@ cd lib/herbalife/private
 cp .env.example .env
 ```
 Fill in your values in `.env`:
+<<<<<<< HEAD
 ```
 DB_HOST=localhost
 DB_USER=root
@@ -72,6 +73,9 @@ CLOUDINARY_API_KEY=your_api_key
 CLOUDINARY_API_SECRET=your_api_secret
 JWT_SECRET=any_long_random_string
 ```
+=======
+
+>>>>>>> ver2
 ### 4. Start the backend
 ```bash
 cd lib/herbalife
@@ -96,17 +100,27 @@ flutter run
 
 ---
 
+<<<<<<< HEAD
 ## 📁 Project Structure
 ```
 lib/herbalife/
-├── private/              # Node.js backend
-│   ├── controller/       # API route handlers
-│   ├── model/            # Database connection
-│   ├── .env.example      # Environment variable template
-│   └── server.js         # Entry point
-└── public/               # Flutter frontend
-    ├── page/             # Screens
-    ├── provider/         # State management
-    ├── model/            # Data models
-    └── widget/           # Reusable widgets
+├── main.dart                 # Flutter app entry point
+├── server.js                 # Node.js backend entry point
+├── package.json              # Node.js dependencies
+├── package-lock.json
+├── schema.sql                # Database schema
+├── l10n/                     # Localization (English & Khmer)
+├── private/                  # Backend logic
+│   ├── controller/           # API route handlers
+│   ├── model/                # Database connection
+│   └── .env.example          # Environment variable template
+└── public/                   # Flutter frontend
+    ├── constants/            # API URLs and app constants
+    ├── page/                 # Screens
+    ├── provider/             # State management
+    ├── model/                # Data models
+    └── widget/               # Reusable widgets
 ```
+=======
+## 📁 Project Structure
+>>>>>>> ver2
