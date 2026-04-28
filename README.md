@@ -1,16 +1,90 @@
-# project2
+# 🌿 Herbalife App
 
-A new Flutter project.
+A full-stack mobile application for managing Herbalife memberships, products, and payments.
 
-## Getting Started
+Built with **Flutter** (frontend) and **Node.js/Express** (backend).
 
-This project is a starting point for a Flutter application.
+---
 
-A few resources to get you started if this is your first Flutter project:
+## 📱 Features
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+- Member registration & login (JWT authentication)
+- Product listing & shopping cart
+- KHQR payment integration
+- Member points & position tracking
+- Profile photo upload (Cloudinary)
+- Khmer & English language support
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+---
+
+## 🛠️ Tech Stack
+
+| Layer | Technology |
+|-------|-----------|
+| Mobile App | Flutter (Dart) |
+| Backend | Node.js + Express |
+| Database | MySQL 8.0 |
+| Auth | JWT |
+| Media | Cloudinary |
+| Payment | KHQR |
+
+---
+
+## ⚙️ Prerequisites
+
+Make sure you have these installed:
+
+- [Flutter SDK](https://flutter.dev/docs/get-started/install)
+- [Node.js](https://nodejs.org/) (v18+)
+- [MySQL 8.0](https://dev.mysql.com/downloads/)
+- A [Cloudinary](https://cloudinary.com) account
+
+---
+
+## 🚀 Getting Started
+
+### 1. Clone the repository
+```bash
+git clone https://github.com/Phanuth25/herbalife.git
+cd herbalife
+```
+
+### 2. Set up the database
+- Create a MySQL database named `herbalife`
+- Import the schema:
+```bash
+mysql -u root -p herbalife < schema.sql
+```
+
+### 3. Configure the backend
+```bash
+cd lib/herbalife/private
+cp .env.example .env
+```
+Fill in your values in `.env`:
+
+### 4. Start the backend
+```bash
+cd lib/herbalife
+npm install
+node server.js
+```
+Server runs on `http://localhost:3000`
+
+### 5. Configure Flutter
+Open `lib/herbalife/public/provider/auth_provider.dart` and change line 13:
+```dart
+final String _accounturl = "http://10.0.2.2:3000/api";
+```
+Replace `10.0.2.2` with your machine's IP address.
+To find your IP run `ipconfig` in terminal and look for **IPv4 Address**.
+
+### 6. Run the Flutter app
+```bash
+flutter pub get
+flutter run
+```
+
+---
+
+## 📁 Project Structure
