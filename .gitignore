@@ -55,7 +55,8 @@ lib/youtube/
 lib/exercise/
 lib/self_learning/
 lib/assignment/
-
+lib/assignment2/
+lib/assignment2.zip
 # Files directly inside lib to ignore
 lib/main.dart
 lib/youtube.dart
