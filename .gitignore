@@ -83,7 +83,7 @@ lib/herbalife/node_modules/
 
 # Unrelated projects and files
 lib/homework/
-private/
+private/node_modules
 flutter_01.png
 flutter_02.png
 flutter_03.png
