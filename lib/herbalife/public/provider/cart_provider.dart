@@ -61,7 +61,7 @@ class CartProvider extends ChangeNotifier {
     }
   }
 
-  Future<void> postitem(int userid, int product, int quantity) async {
+  Future<void> postitem(String? userid, int product, int quantity) async {
     message = "";
     invoiceId = null;
     try {
