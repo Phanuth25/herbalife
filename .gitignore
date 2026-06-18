@@ -46,7 +46,6 @@ app.*.map.json
 
 # Custom lib folders to ignore (except herbalife)
 lib/data/
-lib/l10n/
 lib/public/
 lib/widget/
 lib/contant/
@@ -80,7 +79,7 @@ lib/language_provider.dart
 .env
 lib/herbalife/private/.env
 lib/herbalife/node_modules/
-
+node_modules/
 # Unrelated projects and files
 lib/homework/
 private/node_modules

@@ -47,6 +47,3 @@ flutter:
 
   assets:
     - assets/images/
-    - assets/lotties/
-    - assets/rive/
-    - lib/assignment2/assets/
